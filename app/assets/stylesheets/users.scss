@@ -18,10 +18,16 @@
   th {
     vertical-align: middle;
     text-align: center;
+    background: #fff;
   }
+  
   td {
     vertical-align: middle;
     text-align: center;
+  }
+  
+  tr:nth-child(odd) {
+	  background: #eee;
   }
 }
 

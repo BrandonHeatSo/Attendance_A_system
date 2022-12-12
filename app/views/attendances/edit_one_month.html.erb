@@ -7,8 +7,8 @@
         <tr>
           <th>日付</th>
           <th>曜日</th>
-          <th>出勤時間</th>
-          <th>退勤時間</th>
+          <th>出社</th>
+          <th>退社</th>
           <th>在社時間</th>
           <th>備考</th>
         </tr>
@@ -40,7 +40,7 @@
   </div>
 
   <div class="center">
-    <%= f.submit "まとめて更新", class: "btn btn-lg btn-primary" %>
+    <%= f.submit "編集を保存する", class: "btn btn-lg btn-primary" %>
     <%= link_to "キャンセル", user_path(date: @first_day), class: "btn btn-lg btn-default" %>
   </div>
 <% end %>
