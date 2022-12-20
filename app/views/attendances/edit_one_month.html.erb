@@ -19,7 +19,7 @@
             <tr>
               <td><%= l(day.worked_on, format: :short) %></td>
               <td><%= $days_of_the_week[day.worked_on.wday] %></td>
-              <% if !current_user.admin? && (Date.current < day.worked_on) %>
+              <% if Date.current < day.worked_on %>
                 <td><%= attendance.time_field :started_at, readonly: true, class: "form-control" %></td>
                 <td><%= attendance.time_field :finished_at, readonly: true, class: "form-control" %></td>
               <% else %>
@@ -31,7 +31,11 @@
                   <%= working_times(day.started_at, day.finished_at) %>
                 <% end %>
               </td>
-              <td><%= attendance.text_field :note, class: "form-control" %></td>
+              <% if Date.current < day.worked_on %>
+                <td><%= attendance.text_field :note, readonly: true, class: "form-control" %></td>
+              <% else %>
+                <td><%= attendance.text_field :note, class: "form-control" %></td>
+              <% end %>
             </tr>
           <% end %>
         <% end %>
