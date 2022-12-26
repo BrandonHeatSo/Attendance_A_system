@@ -1,15 +1,14 @@
-<% provide(:title, 'All Users') %>
-<h1>全てのユーザー</h1>
+<% provide(:title, 'Search Results Users') %>
+<h1>検索結果</h1>
 
 <div class="pull-right">
   <%= render 'search_users' %>
 </div>
 
 <div class="col-md-10 col-md-offset-1">
-  <%= will_paginate %>
   <table class="table table-condensed table-hover" id="table-users">
 
-    <% @users.each do |user| %>
+    <% @results.each do |user| %>
       <tr>
         <td>
           <% if current_user.admin? %>
@@ -26,5 +25,4 @@
       </tr>
     <% end %>
   </table>
-  <%= will_paginate %>
 </div>
