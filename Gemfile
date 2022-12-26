@@ -14,7 +14,8 @@ gem 'coffee-rails', '~> 4.2'
 gem 'jquery-rails'
 gem 'turbolinks',   '~> 5'
 gem 'jbuilder',     '~> 2.5'
-gem 'ransack'
+gem 'ransack' # 検索フォーム用gemを導入。
+gem 'rounding' # 時間の指定単位区切り用gemを導入。
 
 group :development, :test do
   gem 'sqlite3'
