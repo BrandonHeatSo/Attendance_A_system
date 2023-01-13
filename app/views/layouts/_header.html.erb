@@ -6,6 +6,8 @@
         <li><%= link_to "トップへ", root_path %></li>
         <% if logged_in? && current_user.admin? %>
           <li><%= link_to "ユーザ一覧", users_path %></li>
+          <li><%= link_to "出勤社員一覧", '#' %></li>
+          <li><%= link_to "拠点情報の修正", '#' %></li>
           <li><%= link_to "基本情報の修正", edit_basic_info_user_path(current_user) %></li>
         <% end %>
         <% if logged_in? %>
