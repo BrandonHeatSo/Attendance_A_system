@@ -7,32 +7,45 @@
         　<%= l(@first_day, format: :middle) %>　時間管理表　
         <%= link_to "→", user_path(date: @first_day.next_month), class: "btn btn-sm btn-primary" %>
       </td>
-      <td>指定勤務時間　<%= format_basic_info(@user.work_time) %></td>
-      <td>基本時間　<%= format_basic_info(@user.basic_time) %></td>
-      <td>初日　<%= l(@first_day, format: :short) %></td>
+      <td>指定勤務開始時間　<%= format_basic_info(@user.work_time) %><br>
+          指定勤務終了時間　<%= format_basic_info(@user.work_time) %></td>
+      <td colspan="2"><br>基本時間　<%= format_basic_info(@user.basic_time) %></td>
+      <td><br>初日　<%= l(@first_day, format: :short) %></td>
     </tr>
 
     <tr>
-      <td>所属：<%= @user.department.present? ? @user.department : "未設定" %></td>
-      <td>氏名：<%= @user.name %></td>
-      <td>出勤日数：<%= @worked_sum %>日</td>
+      <td>所属　<%= @user.department.present? ? @user.department : "未設定" %></td>
+      <td>氏名　<%= @user.name %></td>
+      <td>コード　</td>
+      <td>出勤日数　<%= @worked_sum %>日</td>
       <td>締日　<%= l(@last_day, format: :short) %></td>
     </tr>
   </table>
 </div>
 <div class="btn-users-show">
   <%= link_to "勤怠を編集", attendances_edit_one_month_user_path(date: @first_day), class: "btn btn-primary" %>
+  <%= link_to "CSV出力", '#', method: :patch, class: "btn btn-primary" %><br>
+  <%= link_to "勤怠修正ログ（承認済）", '#', method: :patch, class: "btn btn-primary" %>
 </div>
 <div>
   <table class="table table-bordered table-condensed table-hover" id="table-attendances">
     <thead>
       <tr>
-        <th rowspan="2">日付</th>
-        <th rowspan="2">曜日</th>
+        <th rowspan="3">残業申請</th>
+        <th rowspan="3">日付</th>
+        <th rowspan="3">曜日</th>
+        <th colspan="8">【実績】</th>
+        <th colspan="5">所定外勤務</th>
+      </tr>
+      <tr>  
         <th colspan="3">出社</th>
         <th colspan="3">退社</th>
-        <th rowspan="2">在社時間</th>
-        <th rowspan="2">備考</th>
+        <th rowspan="2"><br>在社時間</th>
+        <th rowspan="2"><br>備考</th>
+        <th colspan="2">終了予定時間</th>
+        <th rowspan="2"><br>時間外時間</th>
+        <th rowspan="2"><br>業務処理内容</th>
+        <th rowspan="2"><br>指示者確認㊞</th>
       </tr>
       <tr>
         <th>時</th>
@@ -41,6 +54,8 @@
         <th>時</th>
         <th>分</th>
         <th></th>
+        <th>時</th>
+        <th>分</th>
       </tr>
     </thead>
 
@@ -56,6 +71,7 @@
           end
         %>
         <tr>
+          <td><%= link_to "残業申請", '#', method: :patch, class: "btn btn-primary" %></td>
           <td><%= l(day.worked_on, format: :short) %></td>
           <td class="<%= css_class %>"><%= $days_of_the_week[day.worked_on.wday] %></td>
           <td><%= l(day.started_at, format: :hour) if day.started_at.present? %></td>
@@ -75,6 +91,11 @@
             <% end %>
           </td>
           <td><%= day.note %></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
         </tr>
       <% end %>
     </tbody>
@@ -82,15 +103,32 @@
     <tfoot>
       <!--rowspan:縦結合、colspan：横結合-->
       <tr>
-        <th colspan="2">累計日数</th>
+        <th colspan="3">累計日数</th>
         <th colspan="6">総合勤務時間</th>
         <th>累計在社時間</th>
-        <th rowspan="2"></th>
+        <th rowspan="3", colspan="5"></th>
+        <th>
+          所属長承認　未
+          <div class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              申請先上長の選択 <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+              <li><%= link_to "勤怠", current_user %></li>
+              <li><%= link_to "設定", edit_user_path(current_user) %></li>
+              <li class="divider"></li>
+              <li>
+                <%= link_to "ログアウト", logout_path, method: :delete %>
+              </li>
+            </ul>
+          </div>
+        </th>
       </tr>
       <tr>
-        <td colspan="2"><%= @attendances.count %></td>
+        <td colspan="3"><%= @attendances.count %></td>
         <td colspan="6"><%= format_basic_info(@user.work_time).to_f * @worked_sum %></td>
         <td><%= format("%.2f", @total_working_times.to_f) %></td>
+        <td><%= link_to "申請", '#', method: :patch, class: "btn btn-primary" %></td>
       </tr>
     </tfoot>    
   </table>
