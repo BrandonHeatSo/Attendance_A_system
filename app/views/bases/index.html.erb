@@ -1,2 +1,36 @@
-<h1>Bases#index</h1>
-<p>Find me in app/views/bases/index.html.erb</p>
+<% provide(:title, 'All Bases') %>
+ 
+<div>
+  <h1>拠点一覧</h1>
+  <table class="table table-bordered table-condensed table-hover" id="table-bases">
+    <thead>
+      <tr>
+        <th></th>
+        <th></th>
+        <th>拠点番号</th>
+        <th>拠点名</th>
+        <th>勤怠種類</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @bases.each do |base| %>
+        <tr>
+          <td><%= link_to "修正", edit_basis_path(base), class: "btn btn-primary" %></td>
+          <td><%= link_to "削除", basis_path(base), method: :delete,
+                    data: {confirm: "削除してよろしいですか？"},
+                    class: "btn btn-primary" %>
+          </td>
+          <td><%= base.base_number %></td>
+          <td><%= base.base_name %></td>
+          <td><%= base.attendance_type %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <%= link_to "拠点情報追加", new_basis_path, class: "btn btn-primary" %>
+    </div>
+  </div>
+</div>

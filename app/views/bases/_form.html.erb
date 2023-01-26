@@ -1,15 +1,15 @@
-<%= form_with(model: base, local: true) do |f| %>
-  <%= render 'shared/error_messages', object: base %>
+<%= form_with(model: @base, local: true) do |f| %>
+  <%= render 'shared/error_messages', object: @base %>
 
   <!-- 拠点番号 -->
-  <%= f.label :base_number, class: "base_label" %>
+  <%= f.label :base_number, class: "label-#{yield(:class_text)}" %>
   <%= f.text_field :base_number, class: "form-control" %>
   <!-- 拠点名 -->
-  <%= f.label :base_name, class: "base_label" %>
+  <%= f.label :base_name, class: "label-#{yield(:class_text)}" %>
   <%= f.text_field :base_name, class: "form-control" %>
   <!-- 勤怠種類 -->
-  <%= f.label :attendance_type, class: "base_label" %>
+  <%= f.label :attendance_type, class: "label-#{yield(:class_text)}" %>
   <%= f.text_field :attendance_type, class: "form-control" %>
 
-  <%= f.submit yield(:button_text), class: "btn btn-primary btn-block btn-base-info" %>
+  <%= f.submit yield(:button_text), class: "btn btn-primary btn-block btn-#{yield(:class_text)}" %>
 <% end %>
