@@ -1,9 +1,9 @@
 class UsersController < ApplicationController
   before_action :set_user, only: [:show, :edit, :update, :destroy, :edit_basic_info, :update_basic_info]
-  before_action :logged_in_user, only: [:index, :search, :edit, :update, :destroy, :edit_basic_info, :update_basic_info]
+  before_action :logged_in_user, only: [:index, :search, :edit, :update, :destroy, :edit_basic_info, :update_basic_info, :attendance_at_work_employees]
   before_action :correct_user, only: [:edit, :update]
   before_action :admin_or_correct_user, only: :show
-  before_action :admin_user, only: [:index, :search, :destroy, :edit_basic_info, :update_basic_info]
+  before_action :admin_user, only: [:index, :search, :destroy, :edit_basic_info, :update_basic_info, :attendance_at_work_employees]
   before_action :set_one_month, only: :show
   before_action :set_q, only: [:index, :search]
 
@@ -67,6 +67,12 @@ class UsersController < ApplicationController
     redirect_to users_url
   end
   
+  def attendance_at_work_employees
+    @users = User.includes(:attendances)
+                 .where(attendances: {worked_on: Date.today, finished_at: nil})
+                 .where.not(attendances: {started_at: nil})
+  end
+
   private
   
     def set_q
@@ -74,7 +80,12 @@ class UsersController < ApplicationController
     end
 
     def user_params
-      params.require(:user).permit(:name, :email, :department, :password, :password_confirmation)
+      params.require(:user).permit(:name,
+                                   :email,
+                                   :department,
+                                   :employee_number,
+                                   :password,
+                                   :password_confirmation)
     end
 
     def basic_info_params

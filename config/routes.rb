@@ -14,6 +14,7 @@ Rails.application.routes.draw do
   resources :users do
     collection do
       get 'search'
+      get 'attendance_at_work_employees'
     end
     member do
       get 'edit_basic_info'
