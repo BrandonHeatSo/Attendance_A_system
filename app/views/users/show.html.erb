@@ -14,7 +14,7 @@
     </tr>
 
     <tr>
-      <td>所属　<%= @user.department.present? ? @user.department : "未設定" %></td>
+      <td>所属　<%= @user.affiliation.present? ? @user.affiliation : "未設定" %></td>
       <td>氏名　<%= @user.name %></td>
       <td>コード　</td>
       <td>出勤日数　<%= @worked_sum %>日</td>
