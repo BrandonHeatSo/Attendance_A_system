@@ -12,6 +12,7 @@ class User < ApplicationRecord
                     uniqueness: true
   validates :affiliation, length: { in: 2..50 }, allow_blank: true
   validates :employee_number, length: { maximum: 20 }, allow_blank: true
+  validates :uid, length: { maximum: 20 }, allow_blank: true
   validates :basic_work_time, presence: true
   validates :designated_work_start_time, presence: true
   validates :designated_work_end_time, presence: true

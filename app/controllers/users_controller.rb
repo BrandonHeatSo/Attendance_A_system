@@ -1,14 +1,14 @@
 class UsersController < ApplicationController
   before_action :set_user, only: [:show, :edit, :update, :destroy, :edit_basic_info, :update_basic_info]
   before_action :logged_in_user, only: [:index, :search, :edit, :update, :destroy, :edit_basic_info, :update_basic_info, :attendance_at_work_employees]
-  before_action :correct_user, only: [:edit, :update]
-  before_action :admin_or_correct_user, only: :show
+  before_action :correct_user, only: :edit
+  before_action :admin_or_correct_user, only: [:show, :update]
   before_action :admin_user, only: [:index, :search, :destroy, :edit_basic_info, :update_basic_info, :attendance_at_work_employees]
   before_action :set_one_month, only: :show
   before_action :set_q, only: [:index, :search]
 
   def index
-    @users = User.paginate(page: params[:page])
+    @users = User.paginate(page: params[:page]).where.not(admin: true)
   end
 
   def show
@@ -36,9 +36,17 @@ class UsersController < ApplicationController
   def update
     if @user.update_attributes(user_params)
       flash[:success] = "ユーザー情報を更新しました。"
-      redirect_to @user
+      if current_user.admin?
+        redirect_to users_url
+      else
+        redirect_to @user
+      end
     else
-      render :edit
+      if current_user.admin?
+        redirect_to users_url
+      else
+        render :edit
+      end
     end
   end
 
@@ -49,7 +57,7 @@ class UsersController < ApplicationController
   end
 
   def search
-    @results = @q.result
+    @results = @q.result.where.not(admin: true)
   end
 
   def edit_basic_info
@@ -84,6 +92,10 @@ class UsersController < ApplicationController
                                    :email,
                                    :affiliation,
                                    :employee_number,
+                                   :uid,
+                                   :basic_work_time,
+                                   :designated_work_start_time,
+                                   :designated_work_end_time,
                                    :password,
                                    :password_confirmation)
     end

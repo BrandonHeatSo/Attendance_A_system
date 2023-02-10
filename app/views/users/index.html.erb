@@ -1,4 +1,6 @@
 <% provide(:title, 'All Users') %>
+<% provide(:class_text, 'user--edit') %>
+<% provide(:button_text, '編集する') %>
 <h1>全てのユーザー</h1>
 
 <div class="pull-right">
@@ -12,16 +14,27 @@
     <% @users.each do |user| %>
       <tr>
         <td>
-          <% if current_user.admin? %>
-            <%= link_to user.name, user %>
-          <% else %>
-            <%= user.name %>
-          <% end %>
-          
           <% if current_user.admin? && !current_user?(user) %>
-             ｜ <%= link_to "削除", user, method: :delete,
-                    data: { confirm: "削除してよろしいですか？" },
-                    class: "btn btn-primary btn-default" %><br>
+            <div>
+              <%= user.name %>
+            </div>
+            <div>
+              ｜ <%= link_to "削除", user, method: :delete,
+                      data: { confirm: "削除してよろしいですか？" },
+                      class: "btn btn-primary btn-default" %>
+            </div>
+            <div class="panel-group">
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                  <button type="button" class="btn btn-primary btn-lg" data-toggle="collapse" data-target="#collapse-<%= user.id %>">
+                    編集
+                  </button>
+                </div>
+                <div id="collapse-<%= user.id %>" class="collapse panel-body">
+                  <%= render 'form', user: user %>
+                </div>
+              </div>
+            </div> 
           <% end %>
         </td>
       </tr>
