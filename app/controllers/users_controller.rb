@@ -1,9 +1,9 @@
 class UsersController < ApplicationController
   before_action :set_user, only: [:show, :edit, :update, :destroy, :edit_basic_info, :update_basic_info]
-  before_action :logged_in_user, only: [:index, :search, :edit, :update, :destroy, :edit_basic_info, :update_basic_info, :attendance_at_work_employees]
+  before_action :logged_in_user, only: [:index, :search, :csv_import, :edit, :update, :destroy, :edit_basic_info, :update_basic_info, :attendance_at_work_employees]
   before_action :correct_user, only: :edit
   before_action :admin_or_correct_user, only: [:show, :update]
-  before_action :admin_user, only: [:index, :search, :destroy, :edit_basic_info, :update_basic_info, :attendance_at_work_employees]
+  before_action :admin_user, only: [:index, :search, :csv_import, :destroy, :edit_basic_info, :update_basic_info, :attendance_at_work_employees]
   before_action :set_one_month, only: :show
   before_action :set_q, only: [:index, :search]
 
@@ -79,6 +79,16 @@ class UsersController < ApplicationController
     @users = User.includes(:attendances)
                  .where(attendances: {worked_on: Date.today, finished_at: nil})
                  .where.not(attendances: {started_at: nil})
+  end
+
+  def csv_import
+    if params[:file].blank?
+      flash[:danger]= "csvファイルが未選択です。選択してください。"
+    else
+      User.import(params[:file])
+      flash[:success] = "csvファイルのインポートに成功しました。"
+    end
+    redirect_to users_url
   end
 
   private

@@ -15,6 +15,7 @@ Rails.application.routes.draw do
     collection do
       get 'search'
       get 'attendance_at_work_employees'
+      post 'csv_import' # csvインポート用アクションを追加。
     end
     member do
       get 'edit_basic_info'

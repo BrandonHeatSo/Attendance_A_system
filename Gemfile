@@ -16,6 +16,7 @@ gem 'turbolinks',   '~> 5'
 gem 'jbuilder',     '~> 2.5'
 gem 'ransack' # 検索フォーム用gemを導入。
 gem 'rounding' # 時間の指定単位区切り用gemを導入。
+gem 'roo' # CSVインポート用gemを導入。
 gem 'coffee-script-source', '1.8.0'
 
 group :development, :test do

@@ -8,6 +8,13 @@
 </div>
 
 <div class="col-md-10 col-md-offset-1">
+  <div class="form-group">
+    <%= form_with(url: csv_import_users_path, local: true) do |f| %>
+      <%= f.file_field :file, accept: '.csv' %><br>
+      <%= f.submit "CSVをインポート", class: "btn btn-primary" %>
+    <% end %>
+  </div>
+
   <%= will_paginate %>
   <table class="table table-condensed table-hover" id="table-users">
 
