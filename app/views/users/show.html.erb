@@ -7,26 +7,47 @@
         　<%= l(@first_day, format: :middle) %>　時間管理表　
         <%= link_to "→", user_path(date: @first_day.next_month), class: "btn btn-sm btn-primary" %>
       </td>
-      <td>指定勤務開始時間　<%= format_basic_info(@user.work_time) %><br>
-          指定勤務終了時間　<%= format_basic_info(@user.work_time) %></td>
-      <td colspan="2"><br>基本時間　<%= format_basic_info(@user.basic_time) %></td>
+      <td>指定勤務開始時間　<%= format_basic_info(@user.designated_work_start_time) %><br>
+          指定勤務終了時間　<%= format_basic_info(@user.designated_work_end_time) %></td>
+      <td colspan="3"><br>基本勤務時間　<%= format_basic_info(@user.basic_work_time) %></td>
       <td><br>初日　<%= l(@first_day, format: :short) %></td>
     </tr>
 
     <tr>
       <td>所属　<%= @user.affiliation.present? ? @user.affiliation : "未設定" %></td>
       <td>氏名　<%= @user.name %></td>
-      <td>コード　</td>
+      <td>コード</td>
+      <td><%= @user.id %></td>
       <td>出勤日数　<%= @worked_sum %>日</td>
       <td>締日　<%= l(@last_day, format: :short) %></td>
     </tr>
   </table>
 </div>
+
+<div class="notice">
+  <% if current_user.superior? %>
+    <p>
+      <div>
+        <%= "【 所属長承認申請のお知らせ 】" %>
+      </div>
+
+      <div>
+        <%= "【 勤怠変更申請のお知らせ 】" %>
+      </div>
+
+      <div>
+        <%= "【 残業申請のお知らせ 】" %>
+      </div>
+    </p>
+  <% end %>
+</div>
+
 <div class="btn-users-show">
   <%= link_to "勤怠を編集", attendances_edit_one_month_user_path(date: @first_day), class: "btn btn-primary" %>
   <%= link_to "CSV出力", '#', method: :patch, class: "btn btn-primary" %><br>
   <%= link_to "勤怠修正ログ（承認済）", '#', method: :patch, class: "btn btn-primary" %>
 </div>
+
 <div>
   <table class="table table-bordered table-condensed table-hover" id="table-attendances">
     <thead>

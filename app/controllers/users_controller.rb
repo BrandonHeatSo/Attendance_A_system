@@ -8,7 +8,7 @@ class UsersController < ApplicationController
   before_action :set_q, only: [:index, :search]
 
   def index
-    @users = User.paginate(page: params[:page]).where.not(admin: true)
+    @users = User.paginate(page: params[:page], per_page: 5).where.not(admin: true)
   end
 
   def show
