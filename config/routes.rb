@@ -23,6 +23,13 @@ Rails.application.routes.draw do
       get 'attendances/edit_one_month'
       patch 'attendances/update_one_month' # この行が追加対象です。
     end
-    resources :attendances, only: :update
+    resources :attendances, only: [:update] do
+      member do
+        get 'edit_overwork_request' # 残業申請モーダルを表示
+        patch 'send_overwork_request' # 残業申請モーダル内容を送信
+        get 'show_overwork_notice' # 送信された残業申請モーダル通知を表示
+        patch 'update_overwork_notice' # 送信された残業申請モーダル通知の承認結果を反映
+      end
+    end
   end
 end

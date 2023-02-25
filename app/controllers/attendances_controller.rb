@@ -1,6 +1,7 @@
 class AttendancesController < ApplicationController
-  before_action :set_user, only: [:edit_one_month, :update_one_month]
-  before_action :logged_in_user, only: [:update, :edit_one_month]
+  before_action :set_user, only: [:edit_one_month, :update_one_month, :edit_overwork_request, :send_overwork_request]
+  before_action :set_attendance, only: [:update, :edit_overwork_request, :send_overwork_request]
+  before_action :logged_in_user, only: [:update, :edit_one_month, :edit_overwork_request, :send_overwork_request]
   before_action :admin_or_correct_user, only: [:update, :edit_one_month, :update_one_month]
   before_action :set_one_month, only: :edit_one_month
 
@@ -8,7 +9,6 @@ class AttendancesController < ApplicationController
 
   def update
     @user = User.find(params[:user_id])
-    @attendance = Attendance.find(params[:id])
     # 出勤時間が未登録であることを判定します。
     if @attendance.started_at.nil?
       if @attendance.update_attributes(started_at: Time.current.floor_to(15.minutes).change(sec: 0))
@@ -24,6 +24,12 @@ class AttendancesController < ApplicationController
       end
     end
     redirect_to @user
+  end
+
+  def edit_overwork_request
+  end
+
+  def send_overwork_request
   end
 
   def edit_one_month
@@ -48,10 +54,24 @@ class AttendancesController < ApplicationController
 
     # 1ヶ月分の勤怠情報を扱います。
     def attendances_params
-      params.require(:user).permit(attendances: [:started_at, :finished_at, :note])[:attendances]
+      params.require(:user).permit(attendances: [:started_at,
+                                                 :finished_at,
+                                                 :note])[:attendances]
+    end
+    
+    def overwork_request_params
+      params.require(:attendance).permit(:overwork_finish_time,
+                                         :overwork_next_day_checkmark,
+                                         :overwork_business_process_content,
+                                         :overwork_stamp_select_superior,
+                                         :overwork_stamp_confirm_step)
     end
     
     # beforeフィルター
+
+    def set_attendance
+      @attendance = Attendance.find(params[:id])
+    end
 
     # 管理権限者、または現在ログインしているユーザーを許可します。
     def admin_or_correct_user

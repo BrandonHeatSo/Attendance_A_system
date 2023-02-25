@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20230204150930) do
+ActiveRecord::Schema.define(version: 20230221205242) do
 
   create_table "attendances", force: :cascade do |t|
     t.date "worked_on"
@@ -20,6 +20,12 @@ ActiveRecord::Schema.define(version: 20230204150930) do
     t.integer "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "overwork_finish_time"
+    t.string "overwork_business_process_content"
+    t.boolean "overwork_next_day_checkmark", default: false
+    t.boolean "overwork_change_checkmark", default: false
+    t.string "overwork_stamp_select_superior"
+    t.string "overwork_stamp_confirm_step"
     t.index ["user_id"], name: "index_attendances_on_user_id"
   end
 
@@ -40,13 +46,13 @@ ActiveRecord::Schema.define(version: 20230204150930) do
     t.string "remember_digest"
     t.boolean "admin", default: false
     t.string "affiliation"
-    t.datetime "basic_time", default: "2023-02-16 23:00:00"
-    t.datetime "work_time", default: "2023-02-16 22:30:00"
+    t.datetime "basic_time", default: "2023-02-24 23:00:00"
+    t.datetime "work_time", default: "2023-02-24 22:30:00"
     t.integer "employee_number"
     t.string "uid"
-    t.datetime "basic_work_time", default: "2023-02-16 23:00:00"
-    t.datetime "designated_work_start_time", default: "2023-02-17 00:00:00"
-    t.datetime "designated_work_end_time", default: "2023-02-17 09:00:00"
+    t.datetime "basic_work_time", default: "2023-02-24 23:00:00"
+    t.datetime "designated_work_start_time", default: "2023-02-25 00:00:00"
+    t.datetime "designated_work_end_time", default: "2023-02-25 09:00:00"
     t.boolean "superior", default: false
     t.index ["email"], name: "index_users_on_email", unique: true
   end
