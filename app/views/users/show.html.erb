@@ -36,6 +36,7 @@
       </div>
 
       <div>
+        <%= link_to "【 残業申請のお知らせ 】", show_overwork_notice_user_attendance_path(@user), remote: true, class: "btn btn-primary" %>
         <%= "【 残業申請のお知らせ 】" %>
       </div>
     </p>
@@ -157,3 +158,4 @@
 
 <!--モーダルウインドウ表示-->
 <div id="edit_overwork_request" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>
+<div id="show_overwork_notice" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>

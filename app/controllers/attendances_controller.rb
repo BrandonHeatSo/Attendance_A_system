@@ -1,5 +1,5 @@
 class AttendancesController < ApplicationController
-  before_action :set_user, only: [:edit_one_month, :update_one_month, :edit_overwork_request, :send_overwork_request]
+  before_action :set_user, only: [:edit_one_month, :update_one_month]
   before_action :set_attendance, only: [:update, :edit_overwork_request, :send_overwork_request]
   before_action :logged_in_user, only: [:update, :edit_one_month, :edit_overwork_request, :send_overwork_request]
   before_action :admin_or_correct_user, only: [:update, :edit_one_month, :update_one_month]
@@ -27,9 +27,13 @@ class AttendancesController < ApplicationController
   end
 
   def edit_overwork_request
+    @user = User.find(params[:user_id])
+    @superior = User.where(superior:true).where.not(id:current_user.id)
   end
 
   def send_overwork_request
+    @user = User.find(params[:user_id])
+    @superior = User.where(superior:true).where.not(id:current_user.id)
   end
 
   def edit_one_month

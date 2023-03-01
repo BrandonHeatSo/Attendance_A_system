@@ -11,8 +11,8 @@
     </div>
     <div class="modal-body">
       <div class="row">
-        <div class="col-md-6 col-md-offset-3">
-          <%= form_with(model: @attendance, url: update_overwork_request_user_attendance_path, local: true, method: :patch) do |f| %>
+        <div class="col-md-12">
+          <%= form_with(model: @attendance, url: send_overwork_request_user_attendance_path, local: true, method: :patch) do |f| %>
           <%= f.hidden_field :overwork_stamp_confirm_step, value: "申請中" %>
             <table class="table table-bordered table-condensed table-hover" id="table-attendances">
               <thead>
