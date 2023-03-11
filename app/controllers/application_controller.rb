@@ -22,12 +22,26 @@ class ApplicationController < ActionController::Base
 
   # アクセスしたユーザーが現在ログインしているユーザーか確認します。
   def correct_user
-    redirect_to(root_url) unless current_user?(@user)
+    unless current_user?(@user)
+      flash[:danger] = "本人アカウントでログインしてください。"
+      redirect_to(root_url)
+    end
   end
 
   # システム管理権限所有かどうか判定します。
   def admin_user
-    redirect_to root_url unless current_user.admin?
+    unless current_user.admin?
+      flash[:danger] = "システム管理権限がありません。"
+      redirect_to root_url
+    end
+  end
+
+  # 上長権限所有かどうか判定します。
+  def superior_user
+    unless current_user.superior?
+      flash[:danger] = "上長権限がありません。"
+      redirect_to root_url
+    end
   end
   
   # ページ出力前に1ヶ月分のデータの存在を確認・セットします。

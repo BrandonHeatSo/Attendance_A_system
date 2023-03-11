@@ -3,9 +3,13 @@
   <table class="table table-bordered table-condensed user-table">
     <tr>
       <td>
-        <%= link_to "←", user_path(date: @first_day.prev_month), class: "btn btn-sm btn-primary" %>
+        <% if current_user?(@user) %>
+          <%= link_to "←", user_path(date: @first_day.prev_month), class: "btn btn-sm btn-primary" %>
+        <% end %>
         　<%= l(@first_day, format: :middle) %>　時間管理表　
-        <%= link_to "→", user_path(date: @first_day.next_month), class: "btn btn-sm btn-primary" %>
+        <% if current_user?(@user) %>
+          <%= link_to "→", user_path(date: @first_day.next_month), class: "btn btn-sm btn-primary" %>
+        <% end %>
       </td>
       <td>指定勤務開始時間　<%= format_basic_info(@user.designated_work_start_time) %><br>
           指定勤務終了時間　<%= format_basic_info(@user.designated_work_end_time) %></td>
@@ -25,7 +29,7 @@
 </div>
 
 <div class="notice">
-  <% if current_user.superior? %>
+  <% if current_user.superior? && current_user?(@user) %>
     <p>
       <div>
         <%= "【 所属長承認申請のお知らせ 】" %>
@@ -44,9 +48,11 @@
 </div>
 
 <div class="btn-users-show">
-  <%= link_to "勤怠を編集", attendances_edit_one_month_user_path(date: @first_day), class: "btn btn-primary" %>
-  <%= link_to "CSV出力", '#', method: :patch, class: "btn btn-primary" %><br>
-  <%= link_to "勤怠修正ログ（承認済）", '#', method: :patch, class: "btn btn-primary" %>
+  <% if current_user?(@user) %>
+    <%= link_to "勤怠を編集", attendances_edit_one_month_user_path(date: @first_day), class: "btn btn-primary" %>
+    <%= link_to "CSV出力", '#', method: :patch, class: "btn btn-primary" %><br>
+    <%= link_to "勤怠修正ログ（承認済）", '#', method: :patch, class: "btn btn-primary" %>
+  <% end %>
 </div>
 
 <div>
@@ -93,14 +99,20 @@
           end
         %>
         <tr>
-          <td><%= link_to "残業申請", edit_overwork_request_user_attendance_path(@user,day), remote: true, class: "btn btn-primary" %></td>
+          <td>
+            <% if current_user?(@user) %>
+              <%= link_to "残業申請", edit_overwork_request_user_attendance_path(@user,day), remote: true, class: "btn btn-primary" %>
+            <% end %>
+          </td>
           <td><%= l(day.worked_on, format: :short) %></td>
           <td class="<%= css_class %>"><%= $days_of_the_week[day.worked_on.wday] %></td>
           <td><%= l(day.started_at, format: :hour) if day.started_at.present? %></td>
           <td><%= l(day.started_at.floor_to(15.minutes), format: :min) if day.started_at.present? %></td>
           <td>
-            <% if btn_text = attendance_state(day) %>
-              <%= link_to "#{btn_text}", user_attendance_path(@user, day), method: :patch, class: "btn btn-primary btn-attendance" %>
+            <% if current_user?(@user) %>
+              <% if btn_text = attendance_state(day) %>
+                <%= link_to "#{btn_text}", user_attendance_path(@user, day), method: :patch, class: "btn btn-primary btn-attendance" %>
+              <% end %>
             <% end %>
           </td>
           <td><%= l(day.finished_at, format: :hour) if day.finished_at.present? %></td>
@@ -150,7 +162,11 @@
         <td colspan="3"><%= @attendances.count %></td>
         <td colspan="6"><%= format_basic_info(@user.work_time).to_f * @worked_sum %></td>
         <td><%= format("%.2f", @total_working_times.to_f) %></td>
-        <td><%= link_to "申請", '#', method: :patch, class: "btn btn-primary" %></td>
+        <td>
+          <% if current_user?(@user) %>
+            <%= link_to "申請", '#', method: :patch, class: "btn btn-primary" %>
+          <% end %>
+        </td>
       </tr>
     </tfoot>    
   </table>

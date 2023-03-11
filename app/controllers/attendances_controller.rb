@@ -1,6 +1,6 @@
 class AttendancesController < ApplicationController
-  before_action :set_user, only: [:edit_one_month, :update_one_month]
-  before_action :set_attendance, only: [:update, :edit_overwork_request, :send_overwork_request]
+  before_action :set_user, only: [:edit_one_month, :update_one_month, :show_overwork_notice]
+  before_action :set_attendance, only: [:update, :edit_overwork_request, :send_overwork_request, :show_overwork_notice]
   before_action :logged_in_user, only: [:update, :edit_one_month, :edit_overwork_request, :send_overwork_request]
   before_action :admin_or_correct_user, only: [:update, :edit_one_month, :update_one_month]
   before_action :set_one_month, only: :edit_one_month
@@ -34,6 +34,44 @@ class AttendancesController < ApplicationController
   def send_overwork_request
     @user = User.find(params[:user_id])
     @superior = User.where(superior:true).where.not(id:current_user.id)
+    if overwork_request_params[:overwork_stamp_select_superior].present? && overwork_request_params[:overwork_finish_time].present? 
+      @attendance.update(overwork_request_params)
+      flash[:success] = "#{@user.name}の残業を申請しました。"
+    elsif overwork_request_params[:overwork_stamp_select_superior].blank? && overwork_request_params[:overwork_finish_time].present? 
+      flash[:danger] = "申請先の上長が未選択です。"
+    elsif overwork_request_params[:overwork_stamp_select_superior].present? && overwork_request_params[:overwork_finish_time].blank? 
+      flash[:danger] = "終了予定時間が未入力です。"
+    elsif overwork_request_params[:overwork_stamp_select_superior].blank? && overwork_request_params[:overwork_finish_time].blank? 
+      flash[:danger] = "申請先の上長が未選択です。終了予定時間が未入力です。"
+    end
+    redirect_to user_url(@user)
+  end
+
+  def show_overwork_notice
+    @overwork_attendances = Attendance.where(overwork_stamp_select_superior: @user.id, overwork_stamp_confirm_step: "申請中")
+                                      .order(:user_id, :worked_on)
+                                      .group_by(&:user_id)
+  end
+
+  def update_overwork_notice
+    @user = User.find(params[:user_id])
+    overwork_notice_params.each do |id, item|
+      attendance = Attendance.find(id)
+      if item[:overwork_change_checkmark]
+        if item[:overwork_stamp_confirm_step] == "なし"
+          attendance.overwork_finish_time = nil
+          attendance.overwork_stamp_select_superior = nil
+          attendance.overwork_business_process_content = nil
+          item[:overwork_stamp_confirm_step] = nil
+          item[:overwork_change_checkmark] = nil
+        end
+        attendance.update(item)
+        flash[:success] = "残業申請の承認結果を送信しました。"
+      else
+        flash[:danger] = "承認確認のチェックを入れてください。"
+      end
+    end
+    redirect_to user_url(@user)
   end
 
   def edit_one_month
@@ -71,6 +109,11 @@ class AttendancesController < ApplicationController
                                          :overwork_stamp_confirm_step)
     end
     
+    def overwork_notice_params
+      params.require(:user).permit(attendances: [:is_check,
+                                                 :overwork_status])[:attendances]
+    end
+
     # beforeフィルター
 
     def set_attendance
