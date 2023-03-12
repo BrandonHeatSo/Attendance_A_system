@@ -125,11 +125,19 @@
             <% end %>
           </td>
           <td><%= day.note %></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
+          <td><%= l(day.overwork_finish_time, format: :hour) if day.overwork_finish_time.present? %></td>
+          <td><%= l(day.overwork_finish_time.floor_to(15.minutes), format: :min) if day.overwork_finish_time.present? %></td>
+          <td><%= working_overwork_times(@user.designated_work_end_time, day.overwork_finish_time, day.overwork_next_day_checkmark) if day.overwork_finish_time.present? %></td>
+          <td><%= day.overwork_business_process_content %></td>
+          <td>
+            <% if day.overwork_stamp_confirm_step == "申請中" %>
+              <%= User.find(day.overwork_stamp_select_superior).name %>に残業申請中　
+            <% elsif day.overwork_stamp_confirm_step == "承認" %>
+              残業承認済　
+            <% elsif day.overwork_stamp_confirm_step == "否認" %>
+              残業否認　
+            <% end %>
+          </td>
         </tr>
       <% end %>
     </tbody>
