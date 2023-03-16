@@ -27,6 +27,7 @@ ja:
           finished_at: 退勤時間
           note: 備考
           user: ユーザーID
+          overwork_change_checkmark: 残業承認『変更』
         base:
           base_number: 拠点番号
           base_name: 拠点名

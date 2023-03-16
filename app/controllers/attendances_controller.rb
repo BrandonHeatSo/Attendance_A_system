@@ -55,22 +55,19 @@ class AttendancesController < ApplicationController
 
   def update_overwork_notice
     @user = User.find(params[:user_id])
-    overwork_notice_params.each do |id, item|
-      attendance = Attendance.find(id)
-      if item[:overwork_change_checkmark]
-        if item[:overwork_stamp_confirm_step] == "なし"
-          attendance.overwork_finish_time = nil
-          attendance.overwork_stamp_select_superior = nil
-          attendance.overwork_business_process_content = nil
-          item[:overwork_stamp_confirm_step] = nil
-          item[:overwork_change_checkmark] = nil
+    ActiveRecord::Base.transaction do # 残業更新用トランザクションを開始します。
+      overwork_notice_params.each do |id, item|
+        unless item[:overwork_change_checkmark] == false
+          attendance = Attendance.find(id)
+          attendance.assign_attributes(item) # オブジェクト変更のみ。ＤＢには未保存。
+          attendance.save!(context: :update_overwork_notice_check) # オブジェクトのバリデーション付ＤＢ保存。
         end
-        attendance.update(item)
-        flash[:success] = "残業申請の承認結果を送信しました。"
-      else
-        flash[:danger] = "承認確認のチェックを入れてください。"
       end
     end
+    flash[:success] = "残業申請の結果を送信しました。"
+    redirect_to user_url(@user)
+  rescue ActiveRecord::RecordInvalid # トランザクションによるエラーの分岐です。      
+    flash[:danger] = "変更チェックボックスにチェックを入れてください。"
     redirect_to user_url(@user)
   end
 
@@ -110,8 +107,8 @@ class AttendancesController < ApplicationController
     end
     
     def overwork_notice_params
-      params.require(:user).permit(attendances: [:is_check,
-                                                 :overwork_status])[:attendances]
+      params.require(:user).permit(attendances: [:overwork_change_checkmark,
+                                                 :overwork_stamp_confirm_step])[:attendances]
     end
 
     # beforeフィルター
