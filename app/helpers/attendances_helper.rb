@@ -15,8 +15,9 @@ module AttendancesHelper
     format("%.2f", (((finish - start) / 60) / 60.0))
   end
 
-  def working_overwork_times(designated_work_end_time, overwork_finish_time, overwork_next_day_checkmark)            
-    if overwork_next_day_checkmark
+  # 時間外時間の設定。
+  def overworking_times(designated_work_end_time, overwork_finish_time, overwork_next_day_checkmark)            
+    unless overwork_next_day_checkmark.blank?
       format("%.2f", (overwork_finish_time.hour - designated_work_end_time.hour) + ((overwork_finish_time.min - designated_work_end_time.min) / 60.0) + 24)
     else
       format("%.2f", (overwork_finish_time.hour - designated_work_end_time.hour) + ((overwork_finish_time.min - designated_work_end_time.min) / 60.0))

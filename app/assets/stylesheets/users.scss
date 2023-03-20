@@ -67,3 +67,12 @@
   margin: 15px 0;
   width: 30%;
 }
+
+/* ユーザー勤怠ページの申請件数通知 */
+.notice-count-border {
+  border: 2px solid;
+  color: red;
+  font-weight: bold;
+  padding: 1px 5px;
+  display: inline-block;
+}

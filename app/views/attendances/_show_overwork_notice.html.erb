@@ -38,7 +38,7 @@
                         <td><%= l(User.find(id).designated_work_end_time, format: :time) %></td>
                         <td>
                           <% if day.overwork_finish_time.present? %>
-                            <%= working_overwork_times(User.find(id).designated_work_end_time, day.overwork_finish_time, day.overwork_next_day_checkmark) %>
+                            <%= overworking_times(User.find(id).designated_work_end_time, day.overwork_finish_time, day.overwork_next_day_checkmark) %>
                           <% end %>
                         </td>
                         <td><%= day.overwork_business_process_content %></td>
@@ -52,10 +52,10 @@
                   <% end %>
                 </tbody>
               </table>
-              <div class="center">
-                <%= f.submit yield(:button_text), class: "btn btn-primary btn-#{yield(:class_text)}" %>
-              </div>
             <% end %>
+            <div class="center">
+                <%= f.submit yield(:button_text), class: "btn btn-primary btn-#{yield(:class_text)}" %>
+            </div>
           <% end %>
         </div>
       </div>

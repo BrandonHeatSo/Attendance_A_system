@@ -12,7 +12,10 @@ class UsersController < ApplicationController
   end
 
   def show
-    @worked_sum = @attendances.where.not(started_at: nil).count
+    @worked_sum = @attendances.where.not(started_at: nil).count # 出勤日数の取得。
+    @superior = User.where(superior: true).where.not(id: @user.id) # 上長の取得。
+    @overwork_notice_sum = Attendance.includes(:user).where(overwork_stamp_select_superior: @user.id,
+                                                            overwork_stamp_confirm_step: "申請中").count # 残業通知件数の取得。
   end
 
   def new

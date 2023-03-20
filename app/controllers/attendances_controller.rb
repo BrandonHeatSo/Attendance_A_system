@@ -37,12 +37,8 @@ class AttendancesController < ApplicationController
     if overwork_request_params[:overwork_stamp_select_superior].present? && overwork_request_params[:overwork_finish_time].present? 
       @attendance.update(overwork_request_params)
       flash[:success] = "#{@user.name}の残業を申請しました。"
-    elsif overwork_request_params[:overwork_stamp_select_superior].blank? && overwork_request_params[:overwork_finish_time].present? 
-      flash[:danger] = "申請先の上長が未選択です。"
-    elsif overwork_request_params[:overwork_stamp_select_superior].present? && overwork_request_params[:overwork_finish_time].blank? 
-      flash[:danger] = "終了予定時間が未入力です。"
-    elsif overwork_request_params[:overwork_stamp_select_superior].blank? && overwork_request_params[:overwork_finish_time].blank? 
-      flash[:danger] = "申請先の上長が未選択です。終了予定時間が未入力です。"
+    else
+      flash[:danger] = "終了予定時間入力と上長選択の両方が無いと、残業は申請できません。"
     end
     redirect_to user_url(@user)
   end
@@ -55,19 +51,31 @@ class AttendancesController < ApplicationController
 
   def update_overwork_notice
     @user = User.find(params[:user_id])
-    ActiveRecord::Base.transaction do # 残業更新用トランザクションを開始します。
+    ActiveRecord::Base.transaction do # 残業通知の更新用トランザクションを開始。
       overwork_notice_params.each do |id, item|
-        unless item[:overwork_change_checkmark] == false
-          attendance = Attendance.find(id)
-          attendance.assign_attributes(item) # オブジェクト変更のみ。ＤＢには未保存。
-          attendance.save!(context: :update_overwork_notice_check) # オブジェクトのバリデーション付ＤＢ保存。
+        attendance = Attendance.find(id)
+        unless item[:overwork_change_checkmark].blank? # 変更チェック有無用の分岐。
+          if item[:overwork_stamp_confirm_step] == "なし" # 申請結果「なし」用の分岐。
+            attendance.overwork_finish_time = nil
+            attendance.overwork_stamp_select_superior = nil
+            attendance.overwork_business_process_content = nil
+            item[:overwork_stamp_confirm_step] = nil
+            item[:overwork_change_checkmark] = nil
+            item[:overwork_next_day_checkmark] = nil
+            attendance.update_attributes!(item) # オブジェクト変更＆ＤＢに保存。
+            flash[:success] = "残業申請を取り消し、残業申請内容を削除しました。"
+          else
+          attendance.update_attributes!(item) # オブジェクト変更＆ＤＢに保存。
+          flash[:success] = "残業申請に対し、結果を送信しました。"
+          end
+        else
+          flash[:danger] = "変更チェックボックスにチェックを入れてください。"
         end
       end
+      redirect_to user_url(@user)
     end
-    flash[:success] = "残業申請の結果を送信しました。"
-    redirect_to user_url(@user)
-  rescue ActiveRecord::RecordInvalid # トランザクションによるエラーの分岐です。      
-    flash[:danger] = "変更チェックボックスにチェックを入れてください。"
+  rescue ActiveRecord::RecordInvalid # トランザクションによるエラーの分岐。
+    flash[:danger] = "無効な入力データがあった為、残業更新をキャンセルしました。"
     redirect_to user_url(@user)
   end
 

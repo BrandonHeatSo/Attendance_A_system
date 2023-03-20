@@ -40,8 +40,14 @@
       </div>
 
       <div>
-        <%= link_to "【 残業申請のお知らせ 】", show_overwork_notice_user_attendance_path(@user), remote: true, class: "btn btn-primary" %>
-        <%= "【 残業申請のお知らせ 】" %>
+        <% if @overwork_notice_sum > 0 %>
+          <%= link_to "【 残業申請のお知らせ 】", show_overwork_notice_user_attendance_path(@user), remote: true, style: "color: red;" %>
+          <span class="notice-count-border">
+            <%= "#{@overwork_notice_sum}件の通知があります" %>
+          </span>
+        <% else %>
+          <%= "【 残業申請のお知らせ 】" %>
+        <% end %>
       </div>
     </p>
   <% end %>
@@ -127,7 +133,7 @@
           <td><%= day.note %></td>
           <td><%= l(day.overwork_finish_time, format: :hour) if day.overwork_finish_time.present? %></td>
           <td><%= l(day.overwork_finish_time.floor_to(15.minutes), format: :min) if day.overwork_finish_time.present? %></td>
-          <td><%= working_overwork_times(@user.designated_work_end_time, day.overwork_finish_time, day.overwork_next_day_checkmark) if day.overwork_finish_time.present? %></td>
+          <td><%= overworking_times(@user.designated_work_end_time, day.overwork_finish_time, day.overwork_next_day_checkmark) if day.overwork_finish_time.present? %></td>
           <td><%= day.overwork_business_process_content %></td>
           <td>
             <% if day.overwork_stamp_confirm_step == "申請中" %>
