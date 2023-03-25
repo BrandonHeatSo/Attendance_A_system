@@ -1,9 +1,9 @@
 class AttendancesController < ApplicationController
-  before_action :set_user, only: [:edit_one_month, :update_one_month, :show_overwork_notice]
+  before_action :set_user, only: [:edit_change_attendace_request, :send_change_attendace_request, :show_overwork_notice]
   before_action :set_attendance, only: [:update, :edit_overwork_request, :send_overwork_request, :show_overwork_notice]
-  before_action :logged_in_user, only: [:update, :edit_one_month, :edit_overwork_request, :send_overwork_request]
-  before_action :admin_or_correct_user, only: [:update, :edit_one_month, :update_one_month]
-  before_action :set_one_month, only: :edit_one_month
+  before_action :logged_in_user, only: [:update, :edit_change_attendace_request, :edit_overwork_request, :send_overwork_request]
+  before_action :admin_or_correct_user, only: [:update, :edit_change_attendace_request, :send_change_attendace_request]
+  before_action :set_one_month, only: :edit_change_attendace_request
 
   UPDATE_ERROR_MSG = "勤怠登録に失敗しました。やり直してください。"
 
@@ -79,10 +79,10 @@ class AttendancesController < ApplicationController
     redirect_to user_url(@user)
   end
 
-  def edit_one_month
+  def edit_change_attendace_request
   end
 
-  def update_one_month
+  def send_change_attendace_request
     ActiveRecord::Base.transaction do # トランザクションを開始します。
       attendances_params.each do |id, item|
         attendance = Attendance.find(id)
@@ -94,7 +94,13 @@ class AttendancesController < ApplicationController
     redirect_to user_url(date: params[:date])
   rescue ActiveRecord::RecordInvalid # トランザクションによるエラーの分岐です。
     flash[:danger] = "無効な入力データがあった為、更新をキャンセルしました。"
-    redirect_to attendances_edit_one_month_user_url(date: params[:date])
+    redirect_to attendances_edit_change_attendace_request_user_url(date: params[:date])
+  end
+
+  def show_change_attendace_notice
+  end
+
+  def update_change_attendace_notice
   end
 
   private

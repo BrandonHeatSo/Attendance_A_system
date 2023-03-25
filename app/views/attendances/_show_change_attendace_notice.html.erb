@@ -1,0 +1,77 @@
+<% provide(:class_text, 'show_change_attendace_notice') %>
+<% provide(:button_text, '変更を送信する') %>
+
+<div class="modal-dialog modal-lg modal-dialog-center">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="row">
+        <div class="col-md-12">
+          <%= form_with(model: @user, url: update_change_attendace_notice_user_attendance_path(@user), local: true, method: :patch) do |f| %>
+            <% @overwork_attendances.each do |id, attendances| %>
+              <h1 class="modal-title">【<%= User.find(id).name %>からの勤怠変更申請】</h1>
+              <table class="table table-bordered table-condensed table-hover" id="table-attendances">
+                <thead>
+                  <!--rowspan:縦結合、colspan：横結合-->
+                  <tr>
+                    <th rowspan="3">日付</th>
+                    <th rowspan="3">曜日</th>
+                    <th colspan="4">変更前</th>
+                    <th colspan="4">変更後</th>
+                    <th>備考</th>
+                    <th>指示者確認㊞</th>
+                    <th>変更</th>
+                    <th>勤怠を確認する</th>
+                  </tr>
+                  <tr>  
+                    <th colspan="2">出社</th>
+                    <th colspan="2">退社</th>
+                    <th colspan="2">出社</th>
+                    <th colspan="2">退社</th>
+                  </tr>
+                  <tr>
+                    <th>時</th>
+                    <th>分</th>
+                    <th>時</th>
+                    <th>分</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% attendances.each do |day| %>
+                    <%= f.fields_for "attendances[]", day do |attendance| %>
+                      <tr>
+                        <td><%= l(day.worked_on, format: :short) %></td>
+                        <td><%= $days_of_the_week[day.worked_on.wday] %></td>
+                        <td><%= l(day.before_change_started_at, format: :hour) if day.before_change_started_at.present? %></td>
+                        <td><%= l(day.before_change_started_at.floor_to(15.minutes), format: :min) if day.before_change_started_at.present? %></td>
+                        <td><%= l(day.before_change_finished_at, format: :hour) if day.before_change_finished_at.present? %></td>
+                        <td><%= l(day.before_change_finished_at.floor_to(15.minutes), format: :min) if day.before_change_finished_at.present? %></td>
+                        <td><%= l(day.after_change_started_at, format: :hour) if day.after_change_started_at.present? %></td>
+                        <td><%= l(day.after_change_started_at.floor_to(15.minutes), format: :min) if day.after_change_started_at.present? %></td>
+                        <td><%= l(day.after_change_finished_at, format: :hour) if day.after_change_finished_at.present? %></td>
+                        <td><%= l(day.after_change_finished_at.floor_to(15.minutes), format: :min) if day.after_change_finished_at.present? %></td>
+                        <td><%= day.note %></td>
+                        <td><%= attendance.select :change_attendace_stamp_confirm_step, [["なし","なし"], ["申請中","申請中"], ["承認","承認"], ["否認","否認"]], class: "form-control" %></td>
+                        <td><%= attendance.check_box :change_attendace_change_checkmark, {}, true, false %></td>
+                        <td>
+                          <%= link_to "確認", user_path(id, date: day.worked_on.beginning_of_month), target: :_blank, rel: "noopener noreferrer", class: "btn btn-primary" %>
+                        </td>
+                      </tr>
+                    <% end %>
+                  <% end %>
+                </tbody>
+              </table>
+            <% end %>
+            <div class="center">
+                <%= f.submit yield(:button_text), class: "btn btn-primary btn-#{yield(:class_text)}" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,5 +1,6 @@
 <% provide(:title, @user.name) %>
-<%= form_with(model: @user, url: attendances_update_one_month_user_path(date: @first_day), local: true, method: :patch) do |f| %>
+<%= form_with(model: @user, url: attendances_send_change_attendace_request_user_path(date: @first_day), local: true, method: :patch) do |f| %>
+<%= f.hidden_field :change_attendace_stamp_confirm_step, value: "申請中" %>
   <div>
     <h1>勤怠編集画面</h1>
     <table class="table table-bordered table-condensed table-hover" id="table-attendances">
@@ -9,8 +10,10 @@
           <th>曜日</th>
           <th>出社</th>
           <th>退社</th>
+          <th>翌日</th>
           <th>在社時間</th>
           <th>備考</th>
+          <th>指示者確認㊞</th>
         </tr>
       </thead>
       <tbody>
@@ -22,9 +25,11 @@
               <% if Date.current < day.worked_on %>
                 <td><%= attendance.time_field :started_at, readonly: true, class: "form-control" %></td>
                 <td><%= attendance.time_field :finished_at, readonly: true, class: "form-control" %></td>
+                <td><%= attendance.check_box :change_attendace_next_day_checkmark, readonly: true, id: "change_attendace_next_day_checkmark" %></td>
               <% else %>
                 <td><%= attendance.time_field :started_at, class: "form-control" %></td>
                 <td><%= attendance.time_field :finished_at, class: "form-control" %></td>
+                <td><%= attendance.check_box :change_attendace_next_day_checkmark, id: "change_attendace_next_day_checkmark" %></td>
               <% end %>
               <td>
                 <% if day.started_at.present? && day.finished_at.present? %>
@@ -33,8 +38,14 @@
               </td>
               <% if Date.current < day.worked_on %>
                 <td><%= attendance.text_field :note, readonly: true, class: "form-control" %></td>
+                <td>
+                  <%= attendance.collection_select :change_attendace_stamp_select_superior, readonly: true, @superior, :id, :name,{prompt: "上長を選択してください"}, {class: "form-control"} %>
+                </td>
               <% else %>
                 <td><%= attendance.text_field :note, class: "form-control" %></td>
+                <td>
+                  <%= attendance.collection_select :change_attendace_stamp_select_superior, @superior, :id, :name,{prompt: "上長を選択してください"}, {class: "form-control"} %>
+                </td>
               <% end %>
             </tr>
           <% end %>
