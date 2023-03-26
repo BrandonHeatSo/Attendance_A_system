@@ -20,8 +20,8 @@ Rails.application.routes.draw do
     member do
       get 'edit_basic_info'
       patch 'update_basic_info'
-      get 'attendances/edit_change_attendace_request' # 勤怠変更申請ページを表示。
-      patch 'attendances/send_change_attendace_request' # 勤怠変更申請ページ内容を送信。
+      get 'attendances/edit_change_attendance_request' # 勤怠変更申請ページを表示。
+      patch 'attendances/send_change_attendance_request' # 勤怠変更申請ページ内容を送信。
     end
     resources :attendances, only: [:update] do
       member do
@@ -29,8 +29,8 @@ Rails.application.routes.draw do
         patch 'send_overwork_request' # 残業申請モーダル内容を送信。
         get 'show_overwork_notice' # 送信された残業申請モーダル通知を表示。
         patch 'update_overwork_notice' # 送信された残業申請モーダル通知の承認結果を反映。
-        get 'show_change_attendace_notice' # 送信された勤怠変更申請モーダル通知を表示。
-        patch 'update_change_attendace_notice' # 送信された勤怠変更申請モーダル通知の承認結果を反映。
+        get 'show_change_attendance_notice' # 送信された勤怠変更申請モーダル通知を表示。
+        patch 'update_change_attendance_notice' # 送信された勤怠変更申請モーダル通知の承認結果を反映。
       end
     end
   end

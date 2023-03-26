@@ -1,9 +1,9 @@
 class AttendancesController < ApplicationController
-  before_action :set_user, only: [:edit_change_attendace_request, :send_change_attendace_request, :show_overwork_notice]
+  before_action :set_user, only: [:edit_change_attendance_request, :send_change_attendance_request, :show_overwork_notice]
   before_action :set_attendance, only: [:update, :edit_overwork_request, :send_overwork_request, :show_overwork_notice]
-  before_action :logged_in_user, only: [:update, :edit_change_attendace_request, :edit_overwork_request, :send_overwork_request]
-  before_action :admin_or_correct_user, only: [:update, :edit_change_attendace_request, :send_change_attendace_request]
-  before_action :set_one_month, only: :edit_change_attendace_request
+  before_action :logged_in_user, only: [:update, :edit_change_attendance_request, :edit_overwork_request, :send_overwork_request]
+  before_action :admin_or_correct_user, only: [:update, :edit_change_attendance_request, :send_change_attendance_request]
+  before_action :set_one_month, only: :edit_change_attendance_request
 
   UPDATE_ERROR_MSG = "勤怠登録に失敗しました。やり直してください。"
 
@@ -79,10 +79,11 @@ class AttendancesController < ApplicationController
     redirect_to user_url(@user)
   end
 
-  def edit_change_attendace_request
+  def edit_change_attendance_request
+    @superior = User.where(superior:true).where.not(id:current_user.id)
   end
 
-  def send_change_attendace_request
+  def send_change_attendance_request
     ActiveRecord::Base.transaction do # トランザクションを開始します。
       attendances_params.each do |id, item|
         attendance = Attendance.find(id)
@@ -97,10 +98,10 @@ class AttendancesController < ApplicationController
     redirect_to attendances_edit_change_attendace_request_user_url(date: params[:date])
   end
 
-  def show_change_attendace_notice
+  def show_change_attendance_notice
   end
 
-  def update_change_attendace_notice
+  def update_change_attendance_notice
   end
 
   private
@@ -109,6 +110,11 @@ class AttendancesController < ApplicationController
     def attendances_params
       params.require(:user).permit(attendances: [:started_at,
                                                  :finished_at,
+                                                 :after_change_started_at,
+                                                 :after_change_finished_at,
+                                                 :change_attendance_next_day_checkmark,
+                                                 :change_attendance_stamp_select_superior,
+                                                 :change_attendance_stamp_confirm_step,
                                                  :note])[:attendances]
     end
     

@@ -1,4 +1,4 @@
-<% provide(:class_text, 'show_change_attendace_notice') %>
+<% provide(:class_text, 'show_change_attendance_notice') %>
 <% provide(:button_text, '変更を送信する') %>
 
 <div class="modal-dialog modal-lg modal-dialog-center">
@@ -11,7 +11,7 @@
     <div class="modal-body">
       <div class="row">
         <div class="col-md-12">
-          <%= form_with(model: @user, url: update_change_attendace_notice_user_attendance_path(@user), local: true, method: :patch) do |f| %>
+          <%= form_with(model: @user, url: update_change_attendance_notice_user_attendance_path(@user), local: true, method: :patch) do |f| %>
             <% @overwork_attendances.each do |id, attendances| %>
               <h1 class="modal-title">【<%= User.find(id).name %>からの勤怠変更申請】</h1>
               <table class="table table-bordered table-condensed table-hover" id="table-attendances">
@@ -55,8 +55,8 @@
                         <td><%= l(day.after_change_finished_at, format: :hour) if day.after_change_finished_at.present? %></td>
                         <td><%= l(day.after_change_finished_at.floor_to(15.minutes), format: :min) if day.after_change_finished_at.present? %></td>
                         <td><%= day.note %></td>
-                        <td><%= attendance.select :change_attendace_stamp_confirm_step, [["なし","なし"], ["申請中","申請中"], ["承認","承認"], ["否認","否認"]], class: "form-control" %></td>
-                        <td><%= attendance.check_box :change_attendace_change_checkmark, {}, true, false %></td>
+                        <td><%= attendance.select :change_attendance_stamp_confirm_step, [["なし","なし"], ["申請中","申請中"], ["承認","承認"], ["否認","否認"]], class: "form-control" %></td>
+                        <td><%= attendance.check_box :change_attendance_change_checkmark, {}, true, false %></td>
                         <td>
                           <%= link_to "確認", user_path(id, date: day.worked_on.beginning_of_month), target: :_blank, rel: "noopener noreferrer", class: "btn btn-primary" %>
                         </td>
