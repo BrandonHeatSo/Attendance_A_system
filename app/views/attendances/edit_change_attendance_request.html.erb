@@ -1,6 +1,6 @@
 <% provide(:title, @user.name) %>
-<%= form_with(model: @user, url: attendances_send_change_attendace_request_user_path(date: @first_day), local: true, method: :patch) do |f| %>
-<%= f.hidden_field :change_attendace_stamp_confirm_step, value: "申請中" %>
+<%= form_with(model: @user, url: attendances_send_change_attendance_request_user_path(date: @first_day), local: true, method: :patch) do |f| %>
+<%= f.hidden_field :change_attendance_stamp_confirm_step, value: "申請中" %>
   <div>
     <h1>勤怠編集画面</h1>
     <table class="table table-bordered table-condensed table-hover" id="table-attendances">
@@ -25,26 +25,26 @@
               <% if Date.current < day.worked_on %>
                 <td><%= attendance.time_field :started_at, readonly: true, class: "form-control" %></td>
                 <td><%= attendance.time_field :finished_at, readonly: true, class: "form-control" %></td>
-                <td><%= attendance.check_box :change_attendace_next_day_checkmark, readonly: true, id: "change_attendace_next_day_checkmark" %></td>
+                <td><%= attendance.check_box :change_attendance_next_day_checkmark, disabled: true, id: "change_attendace_next_day_checkmark" %></td>
               <% else %>
                 <td><%= attendance.time_field :started_at, class: "form-control" %></td>
                 <td><%= attendance.time_field :finished_at, class: "form-control" %></td>
-                <td><%= attendance.check_box :change_attendace_next_day_checkmark, id: "change_attendace_next_day_checkmark" %></td>
+                <td><%= attendance.check_box :change_attendance_next_day_checkmark, id: "change_attendace_next_day_checkmark" %></td>
               <% end %>
               <td>
                 <% if day.started_at.present? && day.finished_at.present? %>
-                  <%= working_times(day.started_at, day.finished_at) %>
+                  <%= working_times(day.started_at, day.finished_at, day.change_attendance_next_day_checkmark) %>
                 <% end %>
               </td>
               <% if Date.current < day.worked_on %>
                 <td><%= attendance.text_field :note, readonly: true, class: "form-control" %></td>
                 <td>
-                  <%= attendance.collection_select :change_attendace_stamp_select_superior, readonly: true, @superior, :id, :name,{prompt: "上長を選択してください"}, {class: "form-control"} %>
+                  <%= attendance.collection_select :change_attendance_stamp_select_superior, @superior, :id, :name,{prompt: "上長を選択してください"}, {class: "form-control", disabled: true} %>
                 </td>
               <% else %>
                 <td><%= attendance.text_field :note, class: "form-control" %></td>
                 <td>
-                  <%= attendance.collection_select :change_attendace_stamp_select_superior, @superior, :id, :name,{prompt: "上長を選択してください"}, {class: "form-control"} %>
+                  <%= attendance.collection_select :change_attendance_stamp_select_superior, @superior, :id, :name,{prompt: "上長を選択してください"}, {class: "form-control"} %>
                 </td>
               <% end %>
             </tr>
@@ -55,7 +55,7 @@
   </div>
 
   <div class="center">
-    <%= f.submit "編集を保存する", class: "btn btn-lg btn-primary" %>
-    <%= link_to "キャンセル", user_path(date: @first_day), class: "btn btn-lg btn-default" %>
+    <%= link_to "キャンセル", user_path(date: @first_day), class: "btn btn-lg btn-primary" %>
+    <%= f.submit "編集を保存する", class: "btn btn-lg btn-primary" %> 
   </div>
 <% end %>

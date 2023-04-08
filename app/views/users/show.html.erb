@@ -36,8 +36,14 @@
       </div>
 
       <div>
-        <%= link_to "【 勤怠変更申請のお知らせ 】", show_change_attendance_notice_user_attendance_path(@user), remote: true, style: "color: red;" %>
-        <%= "【 勤怠変更申請のお知らせ 】" %>
+        <% if @change_attendance_notice_sum > 0 %>
+          <%= link_to "【 勤怠変更申請のお知らせ 】", show_change_attendance_notice_user_attendance_path(@user), remote: true, style: "color: red;" %>
+          <span class="notice-count-border">
+            <%= "#{@change_attendance_notice_sum}件の通知があります" %>
+          </span>
+        <% else %>
+          <%= "【 勤怠変更申請のお知らせ 】" %>
+        <% end %>
       </div>
 
       <div>
@@ -96,6 +102,7 @@
 
     <tbody>
       <% @attendances.each do |day| %>
+        <% attendance = day %>
         <%
           css_class =
           case $days_of_the_week[day.worked_on.wday]
@@ -127,7 +134,7 @@
           <td></td>
           <td>
             <% if day.started_at.present? && day.finished_at.present? %>
-              <%= str_times = working_times(day.started_at.floor_to(15.minutes), day.finished_at.floor_to(15.minutes)) %>
+              <%= str_times = working_times(day.started_at.floor_to(15.minutes), day.finished_at.floor_to(15.minutes), day.change_attendance_next_day_checkmark) %>
               <% @total_working_times = @total_working_times.to_f + str_times.to_f %>
             <% end %>
           </td>
@@ -143,6 +150,13 @@
               残業承認済　
             <% elsif day.overwork_stamp_confirm_step == "否認" %>
               残業否認　
+            <% end %>
+            <% if day.change_attendance_stamp_confirm_step == "申請中" %>
+              <%= User.find_by(id: attendance.change_attendance_stamp_select_superior)&.name %>に勤怠変更申請中
+            <% elsif day.change_attendance_stamp_confirm_step == "承認" %>
+              勤怠変更承認済
+            <% elsif day.change_attendance_stamp_confirm_step == "否認" %>
+              勤怠変更否認
             <% end %>
           </td>
         </tr>

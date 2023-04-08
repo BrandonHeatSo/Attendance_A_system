@@ -12,7 +12,7 @@
       <div class="row">
         <div class="col-md-12">
           <%= form_with(model: @user, url: update_change_attendance_notice_user_attendance_path(@user), local: true, method: :patch) do |f| %>
-            <% @overwork_attendances.each do |id, attendances| %>
+            <% @change_attendances.each do |id, attendances| %>
               <h1 class="modal-title">【<%= User.find(id).name %>からの勤怠変更申請】</h1>
               <table class="table table-bordered table-condensed table-hover" id="table-attendances">
                 <thead>
@@ -22,10 +22,10 @@
                     <th rowspan="3">曜日</th>
                     <th colspan="4">変更前</th>
                     <th colspan="4">変更後</th>
-                    <th>備考</th>
-                    <th>指示者確認㊞</th>
-                    <th>変更</th>
-                    <th>勤怠を確認する</th>
+                    <th rowspan="3">備考</th>
+                    <th rowspan="3">指示者確認㊞</th>
+                    <th rowspan="3">変更</th>
+                    <th rowspan="3">勤怠を確認する</th>
                   </tr>
                   <tr>  
                     <th colspan="2">出社</th>
@@ -38,6 +38,10 @@
                     <th>分</th>
                     <th>時</th>
                     <th>分</th>
+                    <th>時</th>
+                    <th>分</th>
+                    <th>時</th>
+                    <th>分</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -46,10 +50,10 @@
                       <tr>
                         <td><%= l(day.worked_on, format: :short) %></td>
                         <td><%= $days_of_the_week[day.worked_on.wday] %></td>
-                        <td><%= l(day.before_change_started_at, format: :hour) if day.before_change_started_at.present? %></td>
-                        <td><%= l(day.before_change_started_at.floor_to(15.minutes), format: :min) if day.before_change_started_at.present? %></td>
-                        <td><%= l(day.before_change_finished_at, format: :hour) if day.before_change_finished_at.present? %></td>
-                        <td><%= l(day.before_change_finished_at.floor_to(15.minutes), format: :min) if day.before_change_finished_at.present? %></td>
+                        <td><%= l(day.started_at, format: :hour) if day.started_at.present? %></td>
+                        <td><%= l(day.started_at.floor_to(15.minutes), format: :min) if day.started_at.present? %></td>
+                        <td><%= l(day.finished_at, format: :hour) if day.finished_at.present? %></td>
+                        <td><%= l(day.finished_at.floor_to(15.minutes), format: :min) if day.finished_at.present? %></td>
                         <td><%= l(day.after_change_started_at, format: :hour) if day.after_change_started_at.present? %></td>
                         <td><%= l(day.after_change_started_at.floor_to(15.minutes), format: :min) if day.after_change_started_at.present? %></td>
                         <td><%= l(day.after_change_finished_at, format: :hour) if day.after_change_finished_at.present? %></td>
@@ -67,7 +71,7 @@
               </table>
             <% end %>
             <div class="center">
-                <%= f.submit yield(:button_text), class: "btn btn-primary btn-#{yield(:class_text)}" %>
+              <%= f.submit yield(:button_text), class: "btn btn-primary btn-#{yield(:class_text)}" %>
             </div>
           <% end %>
         </div>
