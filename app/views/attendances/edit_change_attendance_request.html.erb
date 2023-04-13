@@ -33,7 +33,7 @@
               <% end %>
               <td>
                 <% if day.started_at.present? && day.finished_at.present? %>
-                  <%= working_times(day.started_at, day.finished_at, day.change_attendance_next_day_checkmark) %>
+                  <%= working_times(day.after_change_started_at, day.after_change_finished_at, day.change_attendance_next_day_checkmark) %>
                 <% end %>
               </td>
               <% if Date.current < day.worked_on %>
