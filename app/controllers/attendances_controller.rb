@@ -36,7 +36,7 @@ class AttendancesController < ApplicationController
     @superior = User.where(superior:true).where.not(id:current_user.id)
     if overwork_request_params[:overwork_stamp_select_superior].present? && overwork_request_params[:overwork_finish_time].present? 
       @attendance.update(overwork_request_params)
-      flash[:success] = "#{@user.name}の残業を申請しました。"
+      flash[:success] = "#{@attendance.worked_on}の残業を申請しました。"
     else
       flash[:danger] = "終了予定時間入力と上長選択の両方が無いと、残業は申請できません。"
     end
@@ -91,8 +91,8 @@ class AttendancesController < ApplicationController
           if item[:started_at].blank? || item[:finished_at].blank?
             flash[:danger] = "出勤時間と退勤時間は両方とも申請に必要です。"
             redirect_to attendances_edit_change_attendance_request_user_url(date: params[:date]) and return
-          elsif !item[:change_attendance_next_day_checkmark] && item[:started_at].to_time > item[:finished_at].to_time
-            flash[:danger] = "翌日チェックが無い場合、出勤時間より早い退勤時間は無効です。"
+          elsif item[:started_at].present? && item[:finished_at].present? && item[:started_at].to_time > item[:finished_at].to_time
+            flash[:danger] = "出勤時間より早い退勤時間は無効です。"
             redirect_to attendances_edit_change_attendance_request_user_url(date: params[:date]) and return
           end
           attendance = Attendance.find(id)
@@ -105,14 +105,11 @@ class AttendancesController < ApplicationController
             attendance.change_attendance_stamp_select_superior = item[:change_attendance_stamp_select_superior]
             attendance.change_attendance_stamp_confirm_step = "申請中"
             attendance.save!(context: :update_one_month_edit) # オブジェクトを変更せずにバリデーション付ＤＢ保存。
+            flash[:success] = "勤怠変更を申請しました。"
           end
-        else
-          flash[:danger] = "申請先の上長選択が無いと、勤怠変更は申請できません。"
-          redirect_to attendances_edit_change_attendance_request_user_url(date: params[:date]) and return
         end
       end
     end
-    flash[:success] = "勤怠変更を申請しました。"
     redirect_to user_url(date: params[:date])
   rescue ActiveRecord::RecordInvalid # トランザクションによるエラーの分岐です。
     flash[:danger] = "無効な入力データがあった為、更新をキャンセルしました。"
@@ -138,8 +135,6 @@ class AttendancesController < ApplicationController
             attendance.after_change_started_at = nil
             attendance.after_change_finished_at = nil
           elsif item[:change_attendance_stamp_confirm_step] == "否認"
-            attendance.started_at = attendance.before_change_started_at
-            attendance.finished_at = attendance.before_change_finished_at
             attendance.after_change_started_at = nil
             attendance.after_change_finished_at = nil
           elsif item[:change_attendance_stamp_confirm_step] == "なし"
@@ -150,9 +145,12 @@ class AttendancesController < ApplicationController
             attendance.note = nil
             item[:change_attendance_stamp_confirm_step] = nil
             item[:change_attendance_next_day_checkmark] = nil
+            item[:change_attendance_stamp_select_superior] = nil
+            attendance.update_attributes!(item) # オブジェクト変更＆ＤＢに保存。
+            flash[:success] = "勤怠変更申請を取り消し、該当日の勤怠内容を削除しました。"
           end
           item[:change_attendance_change_checkmark] = nil
-          attendance.update(item)
+          attendance.update_attributes!(item) # オブジェクト変更＆ＤＢに保存。
           flash[:success] = "勤怠変更申請に対し、結果を送信しました。"
         else
           flash[:danger] = "変更チェックボックスにチェックを入れてください。"
