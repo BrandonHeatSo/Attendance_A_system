@@ -1,9 +1,9 @@
 class AttendancesController < ApplicationController
   before_action :set_user, only: [:show_overwork_notice, :edit_change_attendance_request, :send_change_attendance_request, :show_change_attendance_notice, :update_change_attendance_notice]
-  before_action :set_attendance, only: [:update, :edit_overwork_request, :send_overwork_request, :show_overwork_notice, :edit_change_attendance_request, :send_change_attendance_request]
-  before_action :logged_in_user, only: [:update, :edit_change_attendance_request, :send_change_attendance_request, :edit_overwork_request, :send_overwork_request]
+  before_action :set_attendance, only: [:update, :edit_overwork_request, :send_overwork_request, :show_overwork_notice, :edit_change_attendance_request, :send_change_attendance_request, :log_change_approval]
+  before_action :logged_in_user, only: [:update, :edit_change_attendance_request, :send_change_attendance_request, :edit_overwork_request, :send_overwork_request, :log_change_approval]
   before_action :admin_or_correct_user, only: [:update, :edit_change_attendance_request, :send_change_attendance_request]
-  before_action :set_one_month, only: :edit_change_attendance_request
+  before_action :set_one_month, only: [:edit_change_attendance_request, :log_change_approval]
 
   UPDATE_ERROR_MSG = "勤怠登録に失敗しました。やり直してください。"
 
@@ -161,6 +161,14 @@ class AttendancesController < ApplicationController
   rescue ActiveRecord::RecordInvalid # トランザクションによるエラーの分岐。
     flash[:danger] = "無効な入力データがあった為、勤怠変更の更新をキャンセルしました。"
     redirect_to user_url(@user)
+  end
+
+  def log_change_approval
+    @user = User.find(params[:user_id])
+    if params["select_year(1i)"].present? && params["select_month(2i)"].present?
+      @first_day = (params["select_year(1i)"] + "-" + params["select_month(2i)"] + "-01").to_date
+      @attendances = @user.attendances.where(worked_on: @first_day..@first_day.end_of_month, change_attendance_stamp_confirm_step: "承認").order(:worked_on)
+    end
   end
 
   private

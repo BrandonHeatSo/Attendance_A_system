@@ -1,0 +1,44 @@
+<% provide(:title, 'log_change_approval') %>
+
+<div class="container">
+  <h1>勤怠ログ</h1>
+    <%= form_with(url: log_change_approval_user_attendance_path(@user), local: true, method: :get) do |f| %>
+      <div class="pull-left">
+      <%= f.date_select :select_year,
+        { end_year: Time.now.year, prompt: "年", discard_month: "true", discard_day: "true" },
+        { id: "log-sch", class: "form-control form-sch" } %>
+      <%= f.date_select :select_month,
+        { use_month_numbers: true, prompt: "月", discard_year: "true", discard_day: "true" },
+        { id: "log-sch", class: "form-control form-sch" } %>
+      <%= f.submit "検索", class: 'btn' %>
+      </div>
+    <% end %>
+  <table class="table table-bordered table-condensed table-hover" id="table-attendances">
+    <thead>
+      <tr>
+        <th>日付</th>
+        <th>変更前出勤時間</th>
+        <th>変更前退勤時間</th>
+        <th>変更後出勤時間</th>
+        <th>変更後退勤時間</th>
+        <th>指示者</th>
+        <th>承認日</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if @first_day.present? %>
+        <% @attendances.each do |day| %>
+          <tr>
+            <td><%= day.worked_on.strftime("%Y年%m月%d日(#{$days_of_the_week[day.worked_on.wday]})") %></td>
+            <td><%= l(day.before_change_started_at, format: :time) if day.before_change_started_at.present? %></td>
+            <td><%= l(day.before_change_finished_at, format: :time) if day.before_change_finished_at.present? %></td>
+            <td><%= l(day.started_at, format: :time) if day.started_at.present? %></td>
+            <td><%= l(day.finished_at, format: :time) if day.finished_at.present? %></td>
+            <td><%= day.change_attendance_stamp_select_superior %></td>
+            <td><%= day.updated_at.strftime("%Y年%m月%d日") %></td>
+          </tr>
+        <% end %>
+      <% end %>
+    </tbody>
+  </table>
+</div>
