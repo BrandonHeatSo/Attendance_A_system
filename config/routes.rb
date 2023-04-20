@@ -31,6 +31,7 @@ Rails.application.routes.draw do
         patch 'update_overwork_notice' # 送信された残業申請モーダル通知の承認結果を反映。
         get 'show_change_attendance_notice' # 送信された勤怠変更申請モーダル通知を表示。
         patch 'update_change_attendance_notice' # 送信された勤怠変更申請モーダル通知の承認結果を反映。
+        get 'log _change_approval' # 勤怠修正ログ（承認済）ページを表示。
       end
     end
   end
