@@ -3,7 +3,7 @@ class AttendancesController < ApplicationController
   before_action :set_attendance, only: [:update, :edit_overwork_request, :send_overwork_request, :show_overwork_notice, :edit_change_attendance_request, :send_change_attendance_request, :log_change_approval]
   before_action :logged_in_user, only: [:update, :edit_change_attendance_request, :send_change_attendance_request, :edit_overwork_request, :send_overwork_request, :log_change_approval]
   before_action :admin_or_correct_user, only: [:update, :edit_change_attendance_request, :send_change_attendance_request]
-  before_action :set_one_month, only: [:edit_change_attendance_request, :log_change_approval]
+  before_action :set_one_month, only: [:edit_change_attendance_request]
 
   UPDATE_ERROR_MSG = "勤怠登録に失敗しました。やり直してください。"
 
@@ -79,10 +79,12 @@ class AttendancesController < ApplicationController
     redirect_to user_url(@user)
   end
 
+  # 勤怠変更の申請ページを表示。
   def edit_change_attendance_request
     @superior = User.where(superior:true).where.not(id:current_user.id)
   end
 
+  # 勤怠変更を申請。
   def send_change_attendance_request
     @superior = User.where(superior:true).where.not(id:current_user.id)
     ActiveRecord::Base.transaction do # 勤怠変更の申請用トランザクションを開始。
@@ -91,22 +93,29 @@ class AttendancesController < ApplicationController
           if item[:started_at].blank? || item[:finished_at].blank?
             flash[:danger] = "出勤時間と退勤時間は両方とも申請に必要です。"
             redirect_to attendances_edit_change_attendance_request_user_url(date: params[:date]) and return
-          elsif item[:started_at].present? && item[:finished_at].present? && item[:started_at].to_time > item[:finished_at].to_time
-            flash[:danger] = "出勤時間より早い退勤時間は無効です。"
+            
+          elsif !item[:change_attendance_next_day_checkmark] && item[:started_at].to_time > item[:finished_at].to_time
+            flash[:danger] = "翌日チェックが無い場合、出勤時間より早い退勤時間は無効です。"
             redirect_to attendances_edit_change_attendance_request_user_url(date: params[:date]) and return
           end
+
           attendance = Attendance.find(id)
           before_start_time_store = attendance.started_at.to_time if attendance.started_at.present? # 変更前の出社時間、ＤＢ格納のみ。
           before_finish_time_store = attendance.finished_at.to_time if attendance.finished_at.present? # 変更前の退社時間、ＤＢ格納のみ。
+          change_attendance_next_day_checkmark = item[:change_attendance_next_day_checkmark] # 変更後の翌日チェックの値を一時的に保存.
+
           if ( before_start_time_store != item[:started_at].to_time ) || ( before_finish_time_store != item[:finished_at].to_time )
             attendance.after_change_started_at = item[:started_at]
             attendance.after_change_finished_at = item[:finished_at]
             attendance.note = item[:note]
             attendance.change_attendance_stamp_select_superior = item[:change_attendance_stamp_select_superior]
+            attendance.change_attendance_next_day_checkmark = change_attendance_next_day_checkmark # 一時的に保存した値を使用する.
             attendance.change_attendance_stamp_confirm_step = "申請中"
             attendance.save!(context: :update_one_month_edit) # オブジェクトを変更せずにバリデーション付ＤＢ保存。
             flash[:success] = "勤怠変更を申請しました。"
           end
+        else
+          next # 条件が合わなかったら次のループに進む.
         end
       end
     end
@@ -116,20 +125,24 @@ class AttendancesController < ApplicationController
     redirect_to attendances_edit_change_attendance_request_user_url(date: params[:date])
   end
 
+  # 勤怠変更の通知モーダルを表示。
   def show_change_attendance_notice
     @change_attendances = Attendance.where(change_attendance_stamp_select_superior: @user.id, change_attendance_stamp_confirm_step: "申請中")
                                     .order(:user_id,:worked_on)
                                     .group_by(&:user_id)
   end
 
+  # 勤怠変更の通知モーダル内で、承認結果を反映。
   def update_change_attendance_notice
     ActiveRecord::Base.transaction do # 勤怠変更通知の更新用トランザクションを開始。
       change_attendance_notice_params.each do |id, item|
         attendance = Attendance.find(id)
         unless item[:change_attendance_change_checkmark].blank?
           if item[:change_attendance_stamp_confirm_step] == "承認"
-            attendance.before_change_started_at = attendance.started_at
-            attendance.before_change_finished_at = attendance.finished_at
+            if attendance.before_change_started_at.blank? && attendance.before_change_finished_at.blank?
+              attendance.before_change_started_at = attendance.started_at
+              attendance.before_change_finished_at = attendance.finished_at
+            end
             attendance.started_at = attendance.after_change_started_at
             attendance.finished_at = attendance.after_change_finished_at
             attendance.after_change_started_at = nil
@@ -153,12 +166,14 @@ class AttendancesController < ApplicationController
           attendance.update_attributes!(item) # オブジェクト変更＆ＤＢに保存。
           flash[:success] = "勤怠変更申請に対し、結果を送信しました。"
         else
-          flash[:danger] = "変更チェックボックスにチェックを入れてください。"
+          flash[:danger] = "変更チェックボックスにチェックが無い申請に対しては、結果を送信しませんでした。"
         end
       end
     end
     redirect_to user_url(@user)
-  rescue ActiveRecord::RecordInvalid # トランザクションによるエラーの分岐。
+  # rescue ActiveRecord::RecordInvalid # トランザクションによるエラーの分岐。
+  rescue ActiveRecord::RecordInvalid => e
+    logger.error("Transaction failed: #{e.message}")
     flash[:danger] = "無効な入力データがあった為、勤怠変更の更新をキャンセルしました。"
     redirect_to user_url(@user)
   end
@@ -187,6 +202,7 @@ class AttendancesController < ApplicationController
 
     def change_attendance_notice_params
       params.require(:user).permit(attendances: [:change_attendance_change_checkmark,
+                                                 :change_attendance_next_day_checkmark,
                                                  :change_attendance_stamp_confirm_step])[:attendances]
     end
     

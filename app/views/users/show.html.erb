@@ -64,7 +64,7 @@
   <% if current_user?(@user) %>
     <%= link_to "勤怠を編集", attendances_edit_change_attendance_request_user_path(date: @first_day), class: "btn btn-primary" %>
     <%= link_to "CSV出力", '#', method: :patch, class: "btn btn-primary" %><br>
-    <%= link_to "勤怠修正ログ（承認済）", '#', method: :patch, class: "btn btn-primary" %>
+    <%= link_to "勤怠修正ログ（承認済）", log_change_approval_user_attendance_path(@user), class: "btn btn-primary" %>
   <% end %>
 </div>
 
