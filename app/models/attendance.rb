@@ -7,13 +7,17 @@ class Attendance < ApplicationRecord
   # 出勤時間が存在しない場合、退勤時間は無効
   validate :finished_at_is_invalid_without_a_started_at
   # 退勤時間が存在しない場合、出勤時間は無効（勤怠編集画面での更新時のみ）
-  validate :started_at_is_invalid_without_a_finished_at, on: :update_one_month_edit
+  validate :started_at_is_invalid_without_a_finished_at, on: :send_change_attendance_edit
+
   # 出勤・退勤時間どちらも存在する時、出勤時間より早い退勤時間は無効（翌日チェックが無い場合のみ）
   validate :started_at_than_finished_at_fast_if_invalid
+  # 変更申請時、出勤・退勤時間どちらも存在する時、出勤時間より早い退勤時間は無効（翌日チェックが無い場合のみ）
+  validate :after_change_started_at_than_after_change_finished_at_fast_if_invalid, on: :send_change_attendance_edit
+
   # 未来の出勤時間は無効
-  validate :started_at_cannot_be_in_the_future, on: :update_one_month_edit
+  validate :started_at_cannot_be_in_the_future, on: :send_change_attendance_edit
   # 未来の退勤時刻は無効
-  validate :finished_at_cannot_be_in_the_future, on: :update_one_month_edit
+  validate :finished_at_cannot_be_in_the_future, on: :send_change_attendance_edit
   
   def finished_at_is_invalid_without_a_started_at
     errors.add(:started_at, "が必要です") if started_at.blank? && finished_at.present?
@@ -27,6 +31,15 @@ class Attendance < ApplicationRecord
     if started_at.present? && finished_at.present?
       # 「退勤時間が翌日の場合」かつ「出勤時間が退勤時間より遅い場合」はエラーを返さない
       if !change_attendance_next_day_checkmark && started_at > finished_at
+        errors.add(:started_at, "より早い退勤時間は無効です")
+      end
+    end
+  end
+
+  def after_change_started_at_than_after_change_finished_at_fast_if_invalid
+    if after_change_started_at.present? && after_change_finished_at.present?
+      # 「退勤時間が翌日の場合」かつ「出勤時間が退勤時間より遅い場合」はエラーを返さない
+      if !change_attendance_next_day_checkmark && after_change_started_at > after_change_finished_at
         errors.add(:started_at, "より早い退勤時間は無効です")
       end
     end

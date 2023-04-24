@@ -6,10 +6,10 @@
       <div class="pull-left">
       <%= f.date_select :select_year,
         { end_year: Time.now.year, prompt: "年", discard_month: "true", discard_day: "true" },
-        { id: "log-sch", class: "form-control form-sch" } %>
+        { id: "log-search", class: "form-control" } %>
       <%= f.date_select :select_month,
         { use_month_numbers: true, prompt: "月", discard_year: "true", discard_day: "true" },
-        { id: "log-sch", class: "form-control form-sch" } %>
+        { id: "log-search", class: "form-control" } %>
       <%= f.submit "検索", class: 'btn' %>
       </div>
     <% end %>
