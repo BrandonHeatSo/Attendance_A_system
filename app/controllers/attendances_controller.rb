@@ -171,6 +171,18 @@ class AttendancesController < ApplicationController
     redirect_to user_url(@user)
   end
 
+  def edit_month_request
+  end
+
+  def send_month_request
+  end
+
+  def show_month_notice
+  end
+
+  def update_month_notice
+  end
+
   def log_change_approval
     @user = User.find(params[:user_id])
     if params["select_year(1i)"].present? && params["select_month(2i)"].present?

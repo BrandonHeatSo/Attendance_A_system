@@ -32,7 +32,14 @@
   <% if current_user.superior? && current_user?(@user) %>
     <p>
       <div>
-        <%= "【 所属長承認申請のお知らせ 】" %>
+        <% if @month_notice_sum > 0 %>
+          <%= link_to "【 所属長承認申請のお知らせ 】", show_month_notice_user_attendance_path(@user), remote: true, style: "color: red;" %>
+          <span class="notice-count-border">
+            <%= "#{@month_notice_sum}件の通知があります" %>
+          </span>
+        <% else %>
+          <%= "【 所属長承認申請のお知らせ 】" %>
+        <% end %>
       </div>
 
       <div>
@@ -205,3 +212,4 @@
 <div id="edit_overwork_request" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>
 <div id="show_overwork_notice" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>
 <div id="show_change_attendance_notice" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>
+<div id="show_month_notice" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>

@@ -1,0 +1,49 @@
+<% provide(:class_text, 'show_month_notice') %>
+<% provide(:button_text, '変更を送信する') %>
+
+<div class="modal-dialog modal-lg modal-dialog-center">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+       <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="row">
+        <div class="col-md-12">
+          <%= form_with(model: @user, url: update_month_notice_user_attendance_path(@user), local: true, method: :patch) do |f| %>
+            <% @month_attendances.each do |id, attendances| %>
+              <h1 class="modal-title">【<%= User.find(id).name %>からの1ヶ月分の勤怠申請】</h1>
+              <table class="table table-bordered table-condensed table-hover" id="table-attendances">
+                <thead>
+                  <tr>
+                    <th>月</th>
+                    <th>指示者確認㊞</th>
+                    <th>変更</th>
+                    <th>勤怠を確認する</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% attendances.each do |day| %>
+                    <%= f.fields_for "attendances[]", day do |attendance| %>
+                      <tr>
+                        <td><%= day.worked_on.month %>月</td>
+                        <td><%= attendance.select :month_stamp_confirm_step,  [["なし","なし"], ["申請中","申請中"], ["承認","承認"], ["否認","否認"]], class: "form-control" %></td>
+                        <td><%= attendance.check_box :month_change_checkmark, {}, true, false %></td>
+                        <td><%= link_to "確認", user_path(id, date: day.worked_on.beginning_of_month), target: :_blank, rel: "noopener noreferrer", class: "btn btn-primary" %>
+                        </td>
+                      </tr>
+                    <% end %>
+                  <% end %>
+                </tbody>
+              </table>
+              <div class="center">
+                <%= f.submit yield(:button_text), class: "btn btn-primary btn-#{yield(:class_text)}" %>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

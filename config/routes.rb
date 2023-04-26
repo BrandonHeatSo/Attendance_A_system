@@ -22,6 +22,8 @@ Rails.application.routes.draw do
       patch 'update_basic_info'
       get 'attendances/edit_change_attendance_request' # 勤怠変更申請ページを表示。
       patch 'attendances/send_change_attendance_request' # 勤怠変更申請ページ内容を送信。
+      get 'attendances/edit_month_request' # １ヶ月分の勤怠申請用。ページは新設しない。
+      patch 'attendances/send_month_request' # １ヶ月分の勤怠申請を送信。
     end
     resources :attendances, only: [:update] do
       member do
@@ -31,6 +33,8 @@ Rails.application.routes.draw do
         patch 'update_overwork_notice' # 送信された残業申請モーダル通知の承認結果を反映。
         get 'show_change_attendance_notice' # 送信された勤怠変更申請モーダル通知を表示。
         patch 'update_change_attendance_notice' # 送信された勤怠変更申請モーダル通知の承認結果を反映。
+        get 'show_month_notice' # 送信された１ヶ月分の勤怠申請モーダル通知を表示。
+        patch 'update_month_notice' # 送信された１ヶ月分の勤怠申請モーダル通知の承認結果を反映。
         get 'log_change_approval' # 勤怠修正ログ（承認済）ページを表示。
       end
     end
