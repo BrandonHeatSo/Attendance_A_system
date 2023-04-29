@@ -34,7 +34,7 @@
             <td><%= l(day.before_change_finished_at, format: :time) if day.before_change_finished_at.present? %></td>
             <td><%= l(day.started_at, format: :time) if day.started_at.present? %></td>
             <td><%= l(day.finished_at, format: :time) if day.finished_at.present? %></td>
-            <td><%= day.change_attendance_stamp_select_superior %></td>
+            <td><%= User.find_by(id: day.change_attendance_stamp_select_superior)&.name %></td>
             <td><%= day.updated_at.strftime("%Y年%m月%d日") %></td>
           </tr>
         <% end %>

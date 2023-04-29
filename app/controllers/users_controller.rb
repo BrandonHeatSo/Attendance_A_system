@@ -12,12 +12,15 @@ class UsersController < ApplicationController
   end
 
   def show
+    @attendance = @user.attendances.find_by(worked_on: @first_day)
     @worked_sum = @attendances.where.not(started_at: nil).count # 出勤日数の取得。
     @superior = User.where(superior: true).where.not(id: @user.id) # 上長の取得。
     @overwork_notice_sum = Attendance.includes(:user).where(overwork_stamp_select_superior: @user.id,
                                                             overwork_stamp_confirm_step: "申請中").count # 残業通知件数の取得。
     @change_attendance_notice_sum = Attendance.includes(:user).where(change_attendance_stamp_select_superior: @user.id,
-                                                                     change_attendance_stamp_confirm_step: "申請中").count # 勤怠変更通知件数の取得。                                                                  
+                                                                     change_attendance_stamp_confirm_step: "申請中").count # 勤怠変更通知件数の取得。
+    @month_notice_sum = Attendance.includes(:user).where(month_stamp_select_superior: @user.id,
+                                                         month_stamp_confirm_step: "申請中").count # １ヶ月分勤怠申請の通知件数の取得。                                                            
   end
 
   def new

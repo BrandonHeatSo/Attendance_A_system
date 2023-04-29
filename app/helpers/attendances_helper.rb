@@ -15,7 +15,7 @@ module AttendancesHelper
     if change_attendance_next_day_checkmark && (start >= finish)
       format("%.2f", (((finish - start) / 60) / 60.0) + 24)
     else
-      format("%.2f", (((finish - start) / 60) / 60.0))
+      format("%.2f", ((finish - start) / 60) / 60.0)
     end
   end
 

@@ -51,13 +51,13 @@
                         <td><%= l(day.worked_on, format: :short) %></td>
                         <td><%= $days_of_the_week[day.worked_on.wday] %></td>
                         <td><%= l(day.started_at, format: :hour) if day.started_at.present? %></td>
-                        <td><%= l(day.started_at.floor_to(15.minutes), format: :min) if day.started_at.present? %></td>
+                        <td><%= l(day.started_at, format: :min) if day.started_at.present? %></td>
                         <td><%= l(day.finished_at, format: :hour) if day.finished_at.present? %></td>
-                        <td><%= l(day.finished_at.floor_to(15.minutes), format: :min) if day.finished_at.present? %></td>
+                        <td><%= l(day.finished_at, format: :min) if day.finished_at.present? %></td>
                         <td><%= l(day.after_change_started_at, format: :hour) if day.after_change_started_at.present? %></td>
-                        <td><%= l(day.after_change_started_at.floor_to(15.minutes), format: :min) if day.after_change_started_at.present? %></td>
+                        <td><%= l(day.after_change_started_at, format: :min) if day.after_change_started_at.present? %></td>
                         <td><%= l(day.after_change_finished_at, format: :hour) if day.after_change_finished_at.present? %></td>
-                        <td><%= l(day.after_change_finished_at.floor_to(15.minutes), format: :min) if day.after_change_finished_at.present? %></td>
+                        <td><%= l(day.after_change_finished_at, format: :min) if day.after_change_finished_at.present? %></td>
                         <td><%= day.note %></td>
                         <td><%= attendance.select :change_attendance_stamp_confirm_step, [["なし","なし"], ["申請中","申請中"], ["承認","承認"], ["否認","否認"]], class: "form-control" %></td>
                         <td><%= attendance.check_box :change_attendance_change_checkmark, {}, true, false %></td>
