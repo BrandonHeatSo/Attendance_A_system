@@ -20,7 +20,13 @@ class UsersController < ApplicationController
     @change_attendance_notice_sum = Attendance.includes(:user).where(change_attendance_stamp_select_superior: @user.id,
                                                                      change_attendance_stamp_confirm_step: "申請中").count # 勤怠変更通知件数の取得。
     @month_notice_sum = Attendance.includes(:user).where(month_stamp_select_superior: @user.id,
-                                                         month_stamp_confirm_step: "申請中").count # １ヶ月分勤怠申請の通知件数の取得。                                                            
+                                                         month_stamp_confirm_step: "申請中").count # １ヶ月分勤怠申請の通知件数の取得。
+    respond_to do |format| # csv出力
+      format.html 
+      format.csv do |csv|
+        send_attndances_csv(@attendances)
+      end
+    end
   end
 
   def new
@@ -120,6 +126,33 @@ class UsersController < ApplicationController
 
     def basic_info_params
       params.require(:user).permit(:basic_time, :work_time)
+    end
+
+    def send_attndances_csv(attendances)
+      bom = "\uFEFF" #文字化け防止。
+      csv_data = CSV.generate(bom, encoding: Encoding::SJIS, row_sep: "\r\n", force_quotes: true) do |csv| # 対象データをCSV形式に自動変換。
+        column_names = %w(日付 曜日 出勤時間 退勤時間) # 空白で区切って配列を返す。
+        csv << column_names # 表の列に入る名前を定義。
+        @attendances = @user.attendances.where(worked_on: @first_day..@last_day).order(:worked_on)
+        @attendances.each do |day|
+          column_values = [
+            l(day.worked_on, format: :short),
+            $days_of_the_week[day.worked_on.wday],
+            if day.started_at.present? || (day.change_attendance_stamp_confirm_step == "承認").present?
+              l(day.started_at, format: :time)
+            else
+              ""
+            end,
+            if day.finished_at.present? || (day.change_attendance_stamp_confirm_step == "承認").present?
+              l(day.finished_at, format: :time)
+            else
+              ""
+            end
+          ] # column_valuesに代入するカラム値を定義。
+          csv << column_values # 表の行に入る値を定義。
+        end
+      end
+      send_data(csv_data, filename: "#{@attendance.worked_on.year}年#{@attendance.worked_on.month}月分 #{@user.name} 勤怠一覧.csv") # csv出力のファイル名を定義。
     end
     
     # beforeフィルター
