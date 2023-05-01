@@ -4,6 +4,7 @@ class UsersController < ApplicationController
   before_action :correct_user, only: :edit
   before_action :admin_or_correct_user, only: :update
   before_action :admin_user, only: [:index, :search, :csv_import, :destroy, :edit_basic_info, :update_basic_info, :attendance_at_work_employees]
+  before_action :admin_not_allowed_to_show, only: :show
   before_action :set_one_month, only: :show
   before_action :set_q, only: [:index, :search]
 

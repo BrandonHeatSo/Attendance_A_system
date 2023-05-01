@@ -3,7 +3,9 @@ class AttendancesController < ApplicationController
   before_action :set_attendance, only: [:update, :edit_overwork_request, :send_overwork_request, :show_overwork_notice, :edit_change_attendance_request, :send_change_attendance_request, :log_change_approval]
   before_action :logged_in_user, only: [:update, :edit_change_attendance_request, :send_change_attendance_request, :edit_overwork_request, :send_overwork_request, :send_month_request, :log_change_approval]
   before_action :admin_or_correct_user, only: [:update, :edit_change_attendance_request, :send_change_attendance_request]
-  before_action :set_one_month, only: [:edit_change_attendance_request]
+  before_action :set_one_month, only: :edit_change_attendance_request
+  before_action :admin_not_allowed_to_change, only: :edit_change_attendance_request
+  before_action :superior_user, only: [:update_overwork_notice, :update_change_attendance_notice, :update_month_notice]
 
   UPDATE_ERROR_MSG = "勤怠登録に失敗しました。やり直してください。"
 

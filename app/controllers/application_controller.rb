@@ -39,11 +39,26 @@ class ApplicationController < ActionController::Base
   # 上長権限所有かどうか判定します。
   def superior_user
     unless current_user.superior?
-      flash[:danger] = "上長権限がありません。"
+      flash[:danger] = "上長でないと権限がありません。"
       redirect_to root_url
     end
   end
   
+  # 管理者は勤怠ページの表示は不可。
+  def admin_not_allowed_to_show
+    if current_user.admin?
+      redirect_to root_url
+    end
+  end
+
+  # 管理者は勤怠の変更が不可（エラーメッセージ付き）。
+  def admin_not_allowed_to_change
+    if current_user.admin?
+      flash[:danger] = "管理者には権限がありません。"
+      redirect_to root_url
+    end
+  end
+
   # ページ出力前に1ヶ月分のデータの存在を確認・セットします。
   def set_one_month 
     @first_day = params[:date].nil? ?
