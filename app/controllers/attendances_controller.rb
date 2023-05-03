@@ -118,7 +118,7 @@ class AttendancesController < ApplicationController
     redirect_to user_url(date: params[:date])
   rescue ActiveRecord::RecordInvalid # トランザクションによるエラーの分岐です。
     flash[:danger] = "無効な入力データがあった為、勤怠変更の申請をキャンセルしました。<br>
-                     （翌日チェック無しに、出勤時間より退勤時間が早い日がある・・・などの原因が考えられます。）"
+                     （翌日チェック無しに、出勤時間より退勤時間が早い日がある・・・などの原因が考えられます。）" 
     redirect_to attendances_edit_change_attendance_request_user_url(date: params[:date])
   end
 

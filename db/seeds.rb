@@ -30,3 +30,7 @@ User.create!(name: "上長Ｂ",
                password: password,
                password_confirmation: password)
 end
+
+Base.create!(base_number: "1",
+             base_name: "拠点１",
+             attendance_type: "出勤")

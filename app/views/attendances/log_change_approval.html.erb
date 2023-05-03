@@ -17,11 +17,11 @@
     <thead>
       <tr>
         <th>日付</th>
-        <th>変更前出勤時間</th>
-        <th>変更前退勤時間</th>
-        <th>変更後出勤時間</th>
-        <th>変更後退勤時間</th>
-        <th>指示者</th>
+        <th>変更前出社時間</th>
+        <th>変更前退社時間</th>
+        <th>変更後出社時間</th>
+        <th>変更後退社時間</th>
+        <th>承認者</th>
         <th>承認日</th>
       </tr>
     </thead>
@@ -35,7 +35,7 @@
             <td><%= l(day.started_at, format: :time) if day.started_at.present? %></td>
             <td><%= l(day.finished_at, format: :time) if day.finished_at.present? %></td>
             <td><%= User.find_by(id: day.change_attendance_stamp_select_superior)&.name %></td>
-            <td><%= day.updated_at.strftime("%Y年%m月%d日") %></td>
+            <td><%= day.updated_at.strftime("%Y年%m月%d日(#{$days_of_the_week[day.updated_at.wday]})") %></td>
           </tr>
         <% end %>
       <% end %>

@@ -199,7 +199,7 @@
       </tr>
       <tr>
         <td colspan="3"><%= @attendances.count %></td>
-        <td colspan="6"><%= format_basic_info(@user.work_time).to_f * @worked_sum %></td>
+        <td colspan="6"><%= format_basic_info(@user.basic_work_time).to_f * @worked_sum %></td>
         <td><%= format("%.2f", @total_working_times.to_f) %></td>
       </tr>
     </tfoot>

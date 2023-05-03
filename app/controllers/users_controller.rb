@@ -57,6 +57,7 @@ class UsersController < ApplicationController
         redirect_to @user
       end
     else
+      flash[:danger] = "ユーザー情報の更新は失敗しました。<br>" + @user.errors.full_messages.join("<br>")
       if current_user.admin?
         redirect_to users_url
       else
@@ -132,7 +133,7 @@ class UsersController < ApplicationController
     def send_attndances_csv(attendances)
       bom = "\uFEFF" #文字化け防止。
       csv_data = CSV.generate(bom, encoding: Encoding::SJIS, row_sep: "\r\n", force_quotes: true) do |csv| # 対象データをCSV形式に自動変換。
-        column_names = %w(日付 曜日 出勤時間 退勤時間) # 空白で区切って配列を返す。
+        column_names = %w(日付 曜日 出社時間 退社時間) # 空白で区切って配列を返す。
         csv << column_names # 表の列に入る名前を定義。
         @attendances = @user.attendances.where(worked_on: @first_day..@last_day).order(:worked_on)
         @attendances.each do |day|
