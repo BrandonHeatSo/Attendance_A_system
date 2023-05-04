@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
-ruby '3.2.2'
+ruby '2.7.7'
 gem 'rails',        '~> 5.1.6'
 gem 'rails-i18n' # 日本語化用gemを導入。
 gem 'bcrypt'
