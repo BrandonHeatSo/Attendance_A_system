@@ -103,6 +103,7 @@ GEM
     nio4r (2.5.9)
     nokogiri (1.14.3-x64-mingw32)
       racc (~> 1.4)
+    pg (1.5.3-x64-mingw32)
     polyamorous (2.3.0)
       activerecord (>= 5.0)
     puma (3.12.6)
@@ -214,6 +215,7 @@ DEPENDENCIES
   jbuilder (~> 2.5)
   jquery-rails
   listen (>= 3.0.5, < 3.2)
+  pg
   puma (~> 3.7)
   rails (~> 5.1.6)
   rails-i18n
